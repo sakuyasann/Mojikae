@@ -1,9 +1,15 @@
+/*
+ * 選択フォントが増えても「適用対象」を押し出さないよう、
+ * このセクション自体は縮み、リストだけが内側でスクロールする。
+ * 中身がはみ出して下のセクションへ重ならないよう overflow を切る。
+ */
 .wrapper {
   display: flex;
   flex-direction: column;
 }
 
 .head {
+  flex: none;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -25,6 +31,7 @@
 }
 
 .empty {
+  flex: none;
   padding: 12px;
   text-align: center;
   background: var(--mj-bg-elevated);
@@ -42,6 +49,7 @@
   padding: 0;
   list-style: none;
   position: relative;
+  /* 選んだフォントは全件見せる（内側でスクロールさせない） */
 }
 
 /*
@@ -218,20 +226,27 @@
   color: var(--mj-label-tertiary);
 }
 
-/* 生成される font-family 値 */
+/*
+ * 生成される font-family 値。
+ * フォントを増やすと長くなるので 1 行に抑える（全文は title 属性で見られる）。
+ */
 .stack {
+  flex: none;
   margin: 8px 4px 0;
-  padding: 8px 10px;
+  padding: 7px 10px;
   border-radius: 8px;
   background: var(--mj-fill-quaternary);
   font-family: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
   font-size: 10px;
-  line-height: 1.5;
+  line-height: 1.6;
   color: var(--mj-label-secondary);
-  word-break: break-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .hint {
+  flex: none;
   margin: 6px 4px 0;
   font-size: 11px;
   line-height: 1.5;

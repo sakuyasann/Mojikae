@@ -19,7 +19,9 @@ type DetectedFontListProps = {
 
 /**
  * ページ内で検出した font-family の一覧。
- * 最上部の「ページ全体」を選ぶと個別選択は無効化され、外すと複数選択できる。
+ *
+ * 既定では「ページ全体」の行だけを見せ、個別フォントは折りたたんでおく。
+ * 「ページ全体」のチェックを外すと全件を展開する（内側ではスクロールさせない）。
  */
 export function DetectedFontList({
   groups,
@@ -33,8 +35,6 @@ export function DetectedFontList({
   onGroupToggle,
   className,
 }: DetectedFontListProps) {
-  const individualDisabled = disabled || wholePage;
-
   // 同じ先頭フォント名でも font-family の指定が違えば別グループになる。
   // 例: `Arial, sans-serif` と `Arial`。同名の行が並ぶと区別できないので、
   // 重複しているものだけ font-family 全体を併記する。
@@ -84,18 +84,20 @@ export function DetectedFontList({
               />
               <span className={styles.body}>
                 <span className={`${styles.name} ${styles.nameWhole}`}>ページ全体</span>
-                <span className={styles.count}>コードとアイコンは除外して適用します</span>
+                <span className={styles.count}>
+                  {wholePage
+                    ? 'コードとアイコンは除外して適用します。チェックを外すと個別に選べます'
+                    : `個別に選択中（${groups.length} 種類）`}
+                </span>
               </span>
             </label>
           </li>
 
-          {groups.map((group) => {
-            const checked = !wholePage && selectedGroupIds.has(group.id);
-            const rowClassNames = [
-              styles.row,
-              checked ? styles.rowSelected : '',
-              individualDisabled ? styles.rowDisabled : '',
-            ]
+          {/* 個別フォントは折りたたみ。「ページ全体」を外したときだけ展開する */}
+          {!wholePage &&
+            groups.map((group) => {
+            const checked = selectedGroupIds.has(group.id);
+            const rowClassNames = [styles.row, checked ? styles.rowSelected : '', disabled ? styles.rowDisabled : '']
               .filter(Boolean)
               .join(' ');
 
@@ -106,7 +108,7 @@ export function DetectedFontList({
                     type="checkbox"
                     className={styles.checkbox}
                     checked={checked}
-                    disabled={individualDisabled}
+                    disabled={disabled}
                     onChange={(event) => {
                       onGroupToggle(group.id, event.target.checked);
                     }}

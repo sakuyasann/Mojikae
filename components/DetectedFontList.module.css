@@ -24,15 +24,11 @@
   color: var(--mj-label-tertiary);
 }
 
-/* 唯一のスクロール領域。親（.flexSection）の残り高さいっぱいに伸びる */
+/* 折りたたみを外したときは全件を展開する（内側ではスクロールさせない） */
 .list {
-  flex: 1 1 auto;
-  min-height: 0;
   margin: 0;
   padding: 0;
   list-style: none;
-  overflow-y: auto;
-  overscroll-behavior: contain;
   background: var(--mj-bg-elevated);
   border-radius: var(--mj-radius-card);
 }
@@ -55,11 +51,7 @@
   display: none;
 }
 
-/* 「ページ全体」の行は上部に固定して常に見えるようにする */
 .rowWhole {
-  position: sticky;
-  top: 0;
-  z-index: 1;
   background: var(--mj-bg-elevated);
 }
 
@@ -137,10 +129,6 @@
 }
 
 .empty {
-  flex: 1 1 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   padding: 20px 12px;
   text-align: center;
   background: var(--mj-bg-elevated);

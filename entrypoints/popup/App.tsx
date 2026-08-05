@@ -305,21 +305,18 @@ export default function App() {
 
           <div className={styles.content}>
             <SelectedFonts
-              className={styles.fixedSection}
               fonts={selectedFonts}
               disabled={busy !== null}
               onRemove={removeFont}
               onReorder={reorderFonts}
             />
             <RecentFonts
-              className={styles.fixedSection}
               families={recent}
               selectedFamilies={selectedFamilies}
               disabled={busy !== null || catalog.length === 0}
               onSelect={selectRecentFont}
             />
             <DetectedFontList
-              className={styles.flexSection}
               groups={groups}
               wholePage={wholePage}
               selectedGroupIds={selectedGroupIds}

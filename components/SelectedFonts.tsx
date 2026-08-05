@@ -202,13 +202,13 @@ export function SelectedFonts({ fonts, disabled, onRemove, onReorder, className 
             })}
           </ul>
 
-          <p className={styles.stack}>{buildAppliedFontFamilyValue(fonts)}</p>
+          {/* 1 行に収めているので、全文は title で見られるようにしておく */}
+          <p className={styles.stack} title={buildAppliedFontFamilyValue(fonts)}>
+            {buildAppliedFontFamilyValue(fonts)}
+          </p>
 
           {fonts.length > 1 && (
-            <p className={styles.hint}>
-              上のフォントに無い文字は、下のフォントで表示されます（英字と日本語の使い分けができます）。
-              ハンドルをドラッグすると順番を変えられます。
-            </p>
+            <p className={styles.hint}>上に無い文字は下のフォントで表示されます。ドラッグで並び替え。</p>
           )}
         </>
       )}

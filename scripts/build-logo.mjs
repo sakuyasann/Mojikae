@@ -48,7 +48,7 @@ ${markPaths.map((d) => `          <path d="${d}" />`).join('\n')}
       </svg>
 
       {/* ロゴタイプ（Baloo 2 ExtraBold のアウトライン） */}
-      <svg height={size * 0.58} viewBox="${wordViewBox}" aria-hidden="true">
+      <svg height={size * 0.72} viewBox="${wordViewBox}" aria-hidden="true">
         <path fill="#232b33" d="${wordPath}" />
       </svg>
     </span>

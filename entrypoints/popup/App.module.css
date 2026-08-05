@@ -1,15 +1,14 @@
 /*
- * 外枠はスクロールさせない。
- * スクロールするのは「適用対象」のリストだけにして、入れ子スクロールを避ける。
- * ヘッダー / 検索 / 選択中 / 最近使用 は自然な高さで積み、
- * 余った縦幅をすべて適用対象へ渡す（そこだけが伸縮してスクロールする）。
+ * ポップアップの外枠。
+ * ブラウザのポップアップ最大高（600px）を上限に、中身が少なければ縮む。
+ * 中身が収まらない場合は .content がスクロールする。
+ * 「適用対象」は既定で折りたたんでいるので、通常はスクロールなしで収まる。
  */
 .app {
   display: flex;
   flex-direction: column;
-  height: 600px;
+  max-height: 600px;
   background: var(--mj-bg-grouped);
-  overflow: hidden;
 }
 
 /* 検索バー。候補リストを absolute で重ねるので位置の基準になる */
@@ -25,32 +24,17 @@
 .content {
   flex: 1 1 auto;
   min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
   gap: 14px;
   padding: 14px 12px;
-  overflow: hidden;
-}
-
-/* 選択中・最近使用は内容ぶんだけ */
-.fixedSection {
-  flex: none;
-}
-
-/* 適用対象だけが余白を受け取って伸縮する */
-.flexSection {
-  flex: 1 1 auto;
-  min-height: 132px;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
 }
 
 .loading {
-  flex: 1 1 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 48px 16px;
+  text-align: center;
   color: var(--mj-label-secondary);
   font-size: 13px;
 }
