@@ -23,7 +23,7 @@ const tsx = `type LogoProps = {
 };
 
 /**
- * Mojika のロゴ（マーク + ロゴタイプ）。
+ * Mojikae のロゴ（マーク + ロゴタイプ）。
  *
  * このファイルは .preview/build-logo.mjs が assets/*.svg から生成している。
  * 直接編集せず、assets 側を直して再生成すること。
@@ -35,7 +35,7 @@ export function Logo({ size = 24, className }: LogoProps) {
       className={className}
       style={{ display: ${q}inline-flex${q}, alignItems: ${q}center${q}, gap: size * 0.22 }}
       role="img"
-      aria-label="Mojika"
+      aria-label="Mojikae"
     >
       {/* マーク：スキャン枠 + m + アクセントドット。
           viewBox は中身の実寸（96..416）に切り詰めてある。0 0 512 512 のままだと
