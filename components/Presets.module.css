@@ -1,0 +1,164 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 4px 6px;
+}
+
+.label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.04px;
+  color: var(--mj-label-secondary);
+}
+
+.save {
+  flex: none;
+  height: 22px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--mj-accent);
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.save:not(:disabled):hover {
+  background: var(--mj-fill-quaternary);
+}
+
+.save:disabled {
+  color: var(--mj-label-tertiary);
+  cursor: not-allowed;
+}
+
+/* 保存時の名前入力 */
+.form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 28px;
+  padding: 0 9px;
+  border: none;
+  border-radius: 6px;
+  background: var(--mj-bg-elevated);
+  box-shadow: var(--mj-shadow-control);
+  font-size: 12px;
+}
+
+.input:focus {
+  outline: 3px solid rgba(0, 122, 255, 0.35);
+  outline-offset: 0;
+}
+
+.formButton {
+  flex: none;
+  height: 28px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.confirm {
+  background: var(--mj-accent);
+  color: var(--mj-label-on-accent);
+  font-weight: 500;
+}
+
+.confirm:hover {
+  background: var(--mj-accent-pressed);
+}
+
+.cancel {
+  background: transparent;
+  color: var(--mj-label-secondary);
+}
+
+.cancel:hover {
+  background: var(--mj-fill-quaternary);
+}
+
+/* 保存済みプリセット */
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+  background: var(--mj-bg-elevated);
+  border-radius: 14px;
+  box-shadow: var(--mj-shadow-control);
+  overflow: hidden;
+}
+
+.apply {
+  min-width: 0;
+  height: 28px;
+  padding: 0 4px 0 12px;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  color: var(--mj-label);
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.apply:hover {
+  background: var(--mj-fill-quaternary);
+}
+
+.count {
+  color: var(--mj-label-tertiary);
+  font-size: 10px;
+  margin-left: 4px;
+}
+
+.remove {
+  flex: none;
+  width: 24px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--mj-label-tertiary);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.remove:hover {
+  background: rgba(255, 59, 48, 0.1);
+  color: var(--mj-red);
+}
+
+.empty {
+  margin: 0;
+  padding: 0 4px;
+  font-size: 11px;
+  color: var(--mj-label-tertiary);
+}

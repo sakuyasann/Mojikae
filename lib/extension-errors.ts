@@ -14,6 +14,7 @@ export const ERROR_MESSAGES = {
   APPLY_FAILED: 'フォントの適用に失敗しました',
   RELEASE_FAILED: 'フォントの解除に失敗しました',
   CATALOG_LOAD_FAILED: 'フォント一覧の読み込みに失敗しました',
+  PRESET_SAVE_FAILED: 'プリセットの保存に失敗しました',
 } as const;
 
 export type ExtensionErrorCode = keyof typeof ERROR_MESSAGES;

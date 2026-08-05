@@ -4,15 +4,18 @@ import { DetectedFontList } from '../../components/DetectedFontList';
 import { ErrorMessage } from '../../components/ErrorMessage';
 import { FontSearch } from '../../components/FontSearch';
 import { Header } from '../../components/Header';
+import { Presets } from '../../components/Presets';
 import { RecentFonts } from '../../components/RecentFonts';
 import { SelectedFonts } from '../../components/SelectedFonts';
 import { getActiveTab } from '../../lib/active-tab';
 import { ERROR_MESSAGES, formatErrorMessage, toExtensionError } from '../../lib/extension-errors';
 import { findFontByFamily, loadCatalog, loadRecentFonts, pushRecentFont } from '../../lib/google-fonts';
+import { deletePreset, loadPresets, savePreset } from '../../lib/presets';
 import { applyFont, releaseFont, type ApplyTarget } from '../../lib/tab-injector';
 import { scanActiveTab, type TabScanResult } from '../../lib/tab-scanner';
 import { readTabState } from '../../lib/tab-state';
 import type { GoogleFont } from '../../types/google-font';
+import type { FontPreset } from '../../types/preset';
 import styles from './App.module.css';
 
 /**
@@ -27,6 +30,7 @@ export default function App() {
 
   const [catalog, setCatalog] = useState<GoogleFont[]>([]);
   const [recent, setRecent] = useState<string[]>([]);
+  const [presets, setPresets] = useState<FontPreset[]>([]);
   /** 適用するフォント。配列の順序がそのまま font-family の指定順になる。 */
   const [selectedFonts, setSelectedFonts] = useState<GoogleFont[]>([]);
 
@@ -91,6 +95,12 @@ export default function App() {
         console.error('[Mojikae] 最近使用したフォントの読み込みに失敗しました', caught);
       }
 
+      try {
+        setPresets(await loadPresets());
+      } catch (caught) {
+        console.error('[Mojikae] プリセットの読み込みに失敗しました', caught);
+      }
+
       // ページ内の data 属性から適用状態を復元する。
       // ここで注入できないページは、以降の操作もすべて失敗するので致命扱いにする。
       try {
@@ -142,6 +152,45 @@ export default function App() {
       updated.splice(to, 0, moved);
       return updated;
     });
+  }, []);
+
+  const saveCurrentPreset = useCallback(
+    (name: string) => {
+      const families = selectedFonts.map((font) => font.family);
+      void (async () => {
+        try {
+          setPresets(await savePreset(name, families));
+        } catch (caught) {
+          setError(formatErrorMessage(toExtensionError(caught, 'PRESET_SAVE_FAILED')));
+        }
+      })();
+    },
+    [selectedFonts],
+  );
+
+  const applyPreset = useCallback(
+    (preset: FontPreset) => {
+      const restored = preset.fontFamilies
+        .map((family) => findFontByFamily(catalog, family))
+        .filter((font): font is GoogleFont => font !== undefined);
+      if (restored.length === 0) {
+        setError(ERROR_MESSAGES.FONT_NOT_FOUND);
+        return;
+      }
+      setError(null);
+      setSelectedFonts(restored);
+    },
+    [catalog],
+  );
+
+  const removePreset = useCallback((id: string) => {
+    void (async () => {
+      try {
+        setPresets(await deletePreset(id));
+      } catch (caught) {
+        console.error('[Mojikae] プリセットの削除に失敗しました', caught);
+      }
+    })();
   }, []);
 
   const selectRecentFont = useCallback(
@@ -309,6 +358,14 @@ export default function App() {
               disabled={busy !== null}
               onRemove={removeFont}
               onReorder={reorderFonts}
+            />
+            <Presets
+              presets={presets}
+              currentFontFamilies={selectedFonts.map((font) => font.family)}
+              disabled={busy !== null}
+              onSave={saveCurrentPreset}
+              onApply={applyPreset}
+              onDelete={removePreset}
             />
             <RecentFonts
               families={recent}
