@@ -33,12 +33,14 @@ export function Logo({ size = 24, className }: LogoProps) {
   return (
     <span
       className={className}
-      style={{ display: ${q}inline-flex${q}, alignItems: ${q}center${q}, gap: size * 0.3 }}
+      style={{ display: ${q}inline-flex${q}, alignItems: ${q}center${q}, gap: size * 0.22 }}
       role="img"
       aria-label="Mojika"
     >
-      {/* マーク：スキャン枠 + m + アクセントドット */}
-      <svg width={size} height={size} viewBox="0 0 512 512" aria-hidden="true">
+      {/* マーク：スキャン枠 + m + アクセントドット。
+          viewBox は中身の実寸（96..416）に切り詰めてある。0 0 512 512 のままだと
+          周囲に約 19% の余白が入り、ロゴタイプとの間が開いて見えてしまう。 */}
+      <svg width={size} height={size} viewBox="96 96 320 320" aria-hidden="true">
         <g fill="none" stroke="#232b33" strokeWidth={32} strokeLinecap="round" strokeLinejoin="round">
 ${markPaths.map((d) => `          <path d="${d}" />`).join('\n')}
         </g>
@@ -46,7 +48,7 @@ ${markPaths.map((d) => `          <path d="${d}" />`).join('\n')}
       </svg>
 
       {/* ロゴタイプ（Baloo 2 ExtraBold のアウトライン） */}
-      <svg height={size * 0.55} viewBox="${wordViewBox}" aria-hidden="true">
+      <svg height={size * 0.58} viewBox="${wordViewBox}" aria-hidden="true">
         <path fill="#232b33" d="${wordPath}" />
       </svg>
     </span>

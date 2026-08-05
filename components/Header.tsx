@@ -14,7 +14,7 @@ export function Header({ applied, disabled, onToggle }: HeaderProps) {
     <header className={styles.header}>
       <div className={styles.titleGroup}>
         <h1 className={styles.title}>
-          <Logo size={22} />
+          <Logo size={20} />
         </h1>
         <span className={`${styles.state} ${applied ? styles.stateOn : ''}`}>
           {applied ? 'このページに適用中' : '未適用'}
