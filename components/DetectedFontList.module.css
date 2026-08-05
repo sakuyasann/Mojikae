@@ -1,6 +1,6 @@
 .wrapper {
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--fp-border);
+  display: flex;
+  flex-direction: column;
 }
 
 .head {
@@ -8,70 +8,84 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 6px;
+  margin: 0 4px 6px;
 }
 
 .label {
   margin: 0;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  color: var(--fp-text-muted);
+  letter-spacing: -0.04px;
+  color: var(--mj-label-secondary);
 }
 
 .meta {
   font-size: 11px;
-  color: var(--fp-text-faint);
+  color: var(--mj-label-tertiary);
 }
 
 .list {
   margin: 0;
   padding: 0;
   list-style: none;
-  max-height: 216px;
+  max-height: 240px;
   overflow-y: auto;
-  border: 1px solid var(--fp-border);
-  border-radius: var(--fp-radius);
+  overscroll-behavior: contain;
+  background: var(--mj-bg-elevated);
+  border-radius: var(--mj-radius-card);
 }
 
 .row {
-  border-bottom: 1px solid var(--fp-border);
+  position: relative;
 }
 
-.row:last-child {
-  border-bottom: none;
+.row::after {
+  content: '';
+  position: absolute;
+  left: 44px;
+  right: 0;
+  bottom: 0;
+  height: 0.5px;
+  background: var(--mj-separator);
 }
 
+.list > li:last-of-type .row::after {
+  display: none;
+}
+
+/* 「ページ全体」の行は上部に固定して常に見えるようにする */
 .rowWhole {
-  background: var(--fp-bg-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--mj-bg-elevated);
 }
 
-.rowSelected {
-  background: var(--fp-bg-selected);
-}
-
-.rowDisabled {
-  color: var(--fp-text-faint);
+.rowDisabled .name,
+.rowDisabled .count {
+  color: var(--mj-label-tertiary);
 }
 
 .control {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 7px 9px;
-  min-height: 34px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  min-height: 46px;
   cursor: pointer;
 }
 
 .rowDisabled .control {
-  cursor: not-allowed;
+  cursor: default;
 }
 
+/* macOS のチェックボックス。accent-color でシステムブルーに合わせる */
 .checkbox {
-  margin: 2px 0 0;
   flex: none;
-  width: 14px;
-  height: 14px;
-  accent-color: #18181b;
+  margin: 0;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--mj-accent);
 }
 
 .body {
@@ -84,50 +98,53 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.35;
 }
 
 .nameWhole {
   font-weight: 600;
 }
 
-.count {
-  display: block;
-  font-size: 11px;
-  color: var(--fp-text-muted);
-}
-
-/* 同名グループが並ぶときだけ出す font-family 全体 */
 .stack {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 10px;
-  color: var(--fp-text-faint);
+  color: var(--mj-label-tertiary);
 }
 
+.count {
+  display: block;
+  font-size: 11px;
+  color: var(--mj-label-secondary);
+}
+
+/* アイコンフォントの注意ラベル */
 .iconNote {
   display: inline-block;
   margin-top: 3px;
-  padding: 1px 4px;
+  padding: 1px 6px;
   font-size: 10px;
-  line-height: 1.4;
-  border: 1px solid var(--fp-warn-border);
-  border-radius: 2px;
-  background: var(--fp-warn-bg);
-  color: #93602a;
+  font-weight: 500;
+  line-height: 1.5;
+  border-radius: 20px;
+  background: rgba(255, 149, 0, 0.16);
+  color: #a85f00;
 }
 
 .empty {
-  padding: 10px;
-  border: 1px solid var(--fp-border);
-  border-radius: var(--fp-radius);
-  color: var(--fp-text-muted);
+  padding: 20px 12px;
+  text-align: center;
+  background: var(--mj-bg-elevated);
+  border-radius: var(--mj-radius-card);
+  color: var(--mj-label-secondary);
+  font-size: 13px;
 }
 
 .truncated {
-  margin: 6px 0 0;
+  margin: 6px 4px 0;
   font-size: 11px;
-  color: var(--fp-text-muted);
+  color: var(--mj-label-tertiary);
 }

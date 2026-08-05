@@ -1,20 +1,30 @@
+/* エラー表示：赤の塗りと記号で示す（色だけに依存しない） */
 .message {
   display: flex;
   align-items: flex-start;
-  gap: 6px;
+  gap: 8px;
   margin: 0;
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--fp-border);
-  background: var(--fp-danger-bg);
-  color: var(--fp-danger);
+  padding: 10px 12px;
+  background: rgba(255, 59, 48, 0.1);
+  border-radius: var(--mj-radius-card);
+  color: #b3261e;
   font-size: 12px;
+  line-height: 1.45;
 }
 
-/* 色だけに依存しないよう、記号でもエラーであることを示す */
+/* SF Symbols の exclamationmark.circle.fill 相当 */
 .mark {
   flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: var(--mj-red);
+  color: #fff;
+  font-size: 11px;
   font-weight: 700;
-  line-height: 1.5;
+  line-height: 16px;
+  text-align: center;
 }
 
 .text {
@@ -25,17 +35,35 @@
 .dismiss {
   flex: none;
   height: 20px;
-  padding: 0 6px;
+  padding: 0 8px;
   background: transparent;
-  border: 1px solid currentColor;
-  border-radius: 2px;
-  color: inherit;
+  border: none;
+  border-radius: 10px;
+  color: var(--mj-red);
   font-size: 11px;
+  font-weight: 500;
   cursor: pointer;
 }
 
+.dismiss:hover {
+  background: rgba(255, 59, 48, 0.12);
+}
+
+/* ページ自体が使えない場合は中央に大きく出す */
 .blocking {
-  border-bottom: none;
-  min-height: 120px;
+  flex-direction: column;
   align-items: center;
+  text-align: center;
+  gap: 10px;
+  margin: 12px;
+  padding: 32px 20px;
+  min-height: 140px;
+  justify-content: center;
+}
+
+.blocking .mark {
+  width: 28px;
+  height: 28px;
+  font-size: 18px;
+  line-height: 28px;
 }

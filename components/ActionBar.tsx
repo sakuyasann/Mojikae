@@ -31,7 +31,8 @@ export function ActionBar({
   return (
     <>
       {busy !== null && (
-        <p className={`${styles.status} ${styles.statusBusy}`} role="status" aria-live="polite">
+        <p className={styles.status} role="status" aria-live="polite">
+          <span className={styles.spinner} aria-hidden="true" />
           {BUSY_LABELS[busy]}
         </p>
       )}
@@ -44,10 +45,20 @@ export function ActionBar({
         >
           {busy === 'apply' ? '適用中…' : '適用'}
         </button>
-        <button type="button" className={styles.button} disabled={releaseDisabled} onClick={onRelease}>
+        <button
+          type="button"
+          className={`${styles.button} ${styles.secondary}`}
+          disabled={releaseDisabled}
+          onClick={onRelease}
+        >
           解除
         </button>
-        <button type="button" className={styles.button} disabled={rescanDisabled} onClick={onRescan}>
+        <button
+          type="button"
+          className={`${styles.button} ${styles.secondary}`}
+          disabled={rescanDisabled}
+          onClick={onRescan}
+        >
           再スキャン
         </button>
       </div>

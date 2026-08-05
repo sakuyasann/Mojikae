@@ -1,55 +1,94 @@
+/* 下部のツールバー。半透明でヘアライン区切り（macOS の bottom bar） */
 .bar {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   padding: 10px 12px;
-  border-top: 1px solid var(--fp-border);
-  background: var(--fp-bg);
+  border-top: 0.5px solid var(--mj-separator);
+  background: var(--mj-bg-bar);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
   position: sticky;
   bottom: 0;
 }
 
 .button {
-  height: 34px;
-  padding: 0 12px;
-  background: var(--fp-bg);
-  border: 1px solid var(--fp-border-strong);
-  border-radius: var(--fp-radius);
+  height: 32px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
   white-space: nowrap;
+  font-size: 13px;
+  transition:
+    background-color 120ms ease,
+    opacity 120ms ease;
 }
 
-.button:not(:disabled):hover {
-  border-color: var(--fp-border-active);
-}
-
-.button:disabled {
-  cursor: not-allowed;
-  color: var(--fp-text-faint);
-  background: var(--fp-bg-subtle);
-  border-color: var(--fp-border);
-}
-
+/* 主ボタン：塗りつぶし（Apple の filled button） */
 .primary {
   flex: 1 1 auto;
+  background: var(--mj-accent);
+  color: var(--mj-label-on-accent);
   font-weight: 600;
-  border-color: var(--fp-border-active);
-  border-width: 1px;
+}
+
+.primary:not(:disabled):hover {
+  background: var(--mj-accent-pressed);
 }
 
 .primary:disabled {
-  border-color: var(--fp-border);
-  font-weight: 500;
+  background: var(--mj-fill-tertiary);
+  color: var(--mj-label-tertiary);
+  cursor: not-allowed;
 }
 
+/* 副ボタン：白地 + 薄い影（Apple の bordered button） */
+.secondary {
+  background: var(--mj-bg-elevated);
+  color: var(--mj-accent);
+  box-shadow: var(--mj-shadow-control);
+}
+
+.secondary:not(:disabled):hover {
+  background: var(--mj-fill-quaternary);
+}
+
+.secondary:disabled {
+  color: var(--mj-label-tertiary);
+  cursor: not-allowed;
+  box-shadow: var(--mj-shadow-control);
+}
+
+/* 進行状態。色ではなくスピナーと文言で示す */
 .status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   margin: 0;
-  padding: 0 12px 10px;
+  padding: 0 16px 8px;
   font-size: 11px;
-  color: var(--fp-text-muted);
+  color: var(--mj-label-secondary);
 }
 
-/* 進行中は文字でも状態が分かるようにする（色に依存しない） */
-.statusBusy::before {
-  content: '▸ ';
+.spinner {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid var(--mj-fill-secondary);
+  border-top-color: var(--mj-label-secondary);
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2s;
+  }
 }

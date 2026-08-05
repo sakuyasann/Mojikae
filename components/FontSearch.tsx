@@ -23,6 +23,7 @@ type FontSearchProps = {
 export function FontSearch({ fonts, selectedFamilies, disabled, onToggle }: FontSearchProps) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
+  const [focused, setFocused] = useState(false);
   const [rawActiveIndex, setActiveIndex] = useState(0);
   // useId() は `«r0»` のような CSS セレクタで使えない文字を含むので英数字だけに落とす
   const rawId = useId();
@@ -92,15 +93,18 @@ export function FontSearch({ fonts, selectedFamilies, disabled, onToggle }: Font
 
   return (
     <div className={styles.wrapper}>
-      <label className={styles.label} htmlFor={`${listId}-input`}>
-        Google Fonts を検索
-      </label>
-      <div className={styles.combobox}>
+      <div className={`${styles.field} ${focused ? styles.fieldFocused : ''}`}>
+        {/* SF Symbols の magnifyingglass 相当 */}
+        <svg className={styles.icon} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="7" cy="7" r="4.75" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M10.5 10.5L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
         <input
           id={`${listId}-input`}
           type="text"
-          className={`${styles.input} ${showList ? styles.inputOpen : ''}`}
-          placeholder="フォント名を入力"
+          className={styles.input}
+          placeholder="Google Fonts を検索"
+          aria-label="Google Fonts を検索"
           autoComplete="off"
           spellCheck={false}
           disabled={disabled}
@@ -119,27 +123,45 @@ export function FontSearch({ fonts, selectedFamilies, disabled, onToggle }: Font
             setOpen(true);
           }}
           onFocus={() => {
+            setFocused(true);
             setOpen(true);
           }}
           onBlur={() => {
+            setFocused(false);
             setOpen(false);
           }}
           onKeyDown={handleKeyDown}
         />
-        {showList && (
-          <FontSearchResult
-            listId={listId}
-            items={items}
-            activeIndex={activeIndex}
-            selectedFamilies={selectedFamilies}
-            totalCount={matchedCount}
-            onToggle={toggle}
-            onActiveIndexChange={setActiveIndex}
-          />
+        {query !== '' && (
+          <button
+            type="button"
+            className={styles.clear}
+            aria-label="検索条件を消す"
+            // blur より先に処理するため mousedown を使う
+            onMouseDown={(event) => {
+              event.preventDefault();
+              setQuery('');
+              setActiveIndex(0);
+            }}
+          >
+            ✕
+          </button>
         )}
       </div>
 
-      <p className={styles.hint}>クリック（または Enter）で選択・解除。複数選べます。</p>
+      {showList && (
+        <FontSearchResult
+          listId={listId}
+          items={items}
+          activeIndex={activeIndex}
+          selectedFamilies={selectedFamilies}
+          totalCount={matchedCount}
+          onToggle={toggle}
+          onActiveIndexChange={setActiveIndex}
+        />
+      )}
+
+      <p className={styles.hint}>クリックまたは Enter で選択・解除。複数選べます。</p>
     </div>
   );
 }

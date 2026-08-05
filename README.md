@@ -21,6 +21,7 @@ SaaS・管理画面・Web サイトのフォント選定を主な用途として
 | マニフェスト | Manifest V3（Chromium / Firefox とも） |
 | 対応ブラウザ | Chrome, Edge などの Chromium 系, Firefox 142+ |
 | スタイル | 素の CSS + CSS Modules（UI ライブラリなし） |
+| デザイン | Apple Human Interface Guidelines 準拠（macOS / iOS 風） |
 | Lint | ESLint 9（flat config） |
 | テスト | Vitest |
 | CI | GitHub Actions |
@@ -382,6 +383,22 @@ data-mojikae-family    上書き前の font-family（個別適用の対象要素
 - 走査は 10,000 要素で打ち切ります（打ち切った場合はポップアップに表示します）。
 - 斜体（italic）は読み込みません。MVP では通常体のみを対象にしています。
 - ダークテーマ・サイトごとの設定保存・Google アカウント連携には対応しません。
+
+## UI のデザイン方針
+
+Apple の Human Interface Guidelines に沿った macOS / iOS アプリ風の見た目にしています。
+
+- **色**: システムカラー（`#007aff` / `#34c759` / `#ff3b30`）。グレーは不透明色ではなく半透明を重ねて、
+  Apple のセマンティックカラーと同じく下地に馴染ませる
+- **リスト**: iOS 設定アプリの grouped inset 形式。薄いグレーの下地に白い角丸カード（10px）を並べ、
+  区切り線は左端をインセットしたヘアライン（0.5px）
+- **コントロール**: 主ボタンは塗りつぶし、副ボタンは白地 + 薄い影。スイッチは iOS 標準のピル型
+- **書体**: `-apple-system` / SF Pro。日本語は Hiragino Sans へフォールバック
+- **フォーカス**: 角丸に沿った青いリング（`:focus-visible`）
+
+状態は色だけに頼らず、スイッチのつまみ位置・チェックマーク・優先順位の数字・記号つきラベルでも示しています。
+
+ダークテーマには対応していません（`color-scheme: light` を明示）。
 
 ## UI のライブプレビュー
 

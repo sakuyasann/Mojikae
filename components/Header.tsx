@@ -11,11 +11,13 @@ type HeaderProps = {
 export function Header({ applied, disabled, onToggle }: HeaderProps) {
   return (
     <header className={styles.header}>
-      <h1 className={styles.title}>Mojikae</h1>
-      <div className={styles.right}>
-        <span className={styles.stateText}>{applied ? '適用中' : '未適用'}</span>
-        <Toggle checked={applied} disabled={disabled} label="フォントの適用" onChange={onToggle} />
+      <div className={styles.titleGroup}>
+        <h1 className={styles.title}>Mojikae</h1>
+        <span className={`${styles.state} ${applied ? styles.stateOn : ''}`}>
+          {applied ? 'このページに適用中' : '未適用'}
+        </span>
       </div>
+      <Toggle checked={applied} disabled={disabled} label="フォントの適用" onChange={onToggle} />
     </header>
   );
 }

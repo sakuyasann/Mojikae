@@ -1,14 +1,14 @@
 .wrapper {
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--fp-border);
+  display: flex;
+  flex-direction: column;
 }
 
 .label {
-  display: block;
-  margin: 0 0 6px;
-  font-size: 11px;
+  margin: 0 4px 6px;
+  font-size: 12px;
   font-weight: 600;
-  color: var(--fp-text-muted);
+  letter-spacing: -0.04px;
+  color: var(--mj-label-secondary);
 }
 
 .list {
@@ -20,38 +20,47 @@
   list-style: none;
 }
 
+/* カプセル型のチップ（iOS のタグ表示） */
 .chip {
-  height: 26px;
+  height: 28px;
   max-width: 100%;
-  padding: 0 8px;
-  background: var(--fp-bg);
-  border: 1px solid var(--fp-border-strong);
-  border-radius: var(--fp-radius);
+  padding: 0 12px;
+  background: var(--mj-bg-elevated);
+  border: none;
+  border-radius: 14px;
+  box-shadow: var(--mj-shadow-control);
   cursor: pointer;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 12px;
+  color: var(--mj-label);
+  transition: background-color 120ms ease;
 }
 
-.chip:hover {
-  border-color: var(--fp-border-active);
+.chip:not(:disabled):hover {
+  background: var(--mj-fill-quaternary);
 }
 
 .chip:disabled {
   cursor: not-allowed;
-  color: var(--fp-text-faint);
-  background: var(--fp-bg-subtle);
+  opacity: 0.4;
 }
 
 .chipSelected {
-  border-color: var(--fp-border-active);
-  background: var(--fp-bg-selected);
-  font-weight: 600;
+  background: var(--mj-accent);
+  color: var(--mj-label-on-accent);
+  font-weight: 500;
+  box-shadow: none;
+}
+
+.chipSelected:not(:disabled):hover {
+  background: var(--mj-accent-pressed);
 }
 
 .empty {
   margin: 0;
+  padding: 0 4px;
   font-size: 11px;
-  color: var(--fp-text-faint);
+  color: var(--mj-label-tertiary);
 }

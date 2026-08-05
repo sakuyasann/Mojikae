@@ -1,32 +1,56 @@
 /*
- * ポップアップ共通のトークンとリセット。
- * ライトテーマのみ・フラット・border-first。影は使わない。
+ * Apple のデザインシステム（Human Interface Guidelines）に沿ったトークン。
+ *
+ * - 色は macOS / iOS のシステムカラーに合わせる
+ * - グレー系は不透明色ではなく半透明で重ねる（Apple のセマンティックカラーと同じ考え方）
+ * - リストは iOS 設定アプリの "grouped inset" 形式（角丸カード + 内側インセットの区切り線）
+ * - 角丸は控えめな枠線ではなく、面と余白で構造を作る
  */
 
 :root {
-  --fp-bg: #ffffff;
-  --fp-bg-subtle: #fafafa;
-  --fp-bg-selected: #f2f4f7;
+  color-scheme: light;
 
-  --fp-border: #e4e4e7;
-  --fp-border-strong: #c8c8cd;
-  --fp-border-active: #18181b;
+  /* システムカラー */
+  --mj-accent: #007aff;
+  --mj-accent-pressed: #0062cc;
+  --mj-red: #ff3b30;
+  --mj-orange: #ff9500;
+  --mj-green: #34c759;
 
-  --fp-text: #18181b;
-  --fp-text-muted: #71717a;
-  --fp-text-faint: #a1a1aa;
+  /* 背景（グループ化されたリスト用の 2 層構造） */
+  --mj-bg-grouped: #f2f2f7;
+  --mj-bg-elevated: #ffffff;
+  --mj-bg-bar: rgba(255, 255, 255, 0.8);
 
-  --fp-focus: #2563eb;
-  --fp-danger: #b42318;
-  --fp-danger-bg: #fef3f2;
-  --fp-warn-bg: #fffaeb;
-  --fp-warn-border: #f0d194;
+  /* 塗り（半透明で下地に馴染ませる） */
+  --mj-fill-quaternary: rgba(116, 116, 128, 0.08);
+  --mj-fill-tertiary: rgba(118, 118, 128, 0.12);
+  --mj-fill-secondary: rgba(120, 120, 128, 0.16);
 
-  --fp-radius: 3px;
-  --fp-control-height: 32px;
-  --fp-gap: 8px;
+  /* 文字 */
+  --mj-label: rgba(0, 0, 0, 0.92);
+  --mj-label-secondary: rgba(60, 60, 67, 0.6);
+  --mj-label-tertiary: rgba(60, 60, 67, 0.32);
+  --mj-label-on-accent: #ffffff;
 
-  --fp-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Hiragino Sans',
+  /* 区切り線（ヘアライン） */
+  --mj-separator: rgba(60, 60, 67, 0.18);
+  --mj-separator-opaque: #d1d1d6;
+
+  /* 角丸 */
+  --mj-radius-card: 10px;
+  --mj-radius-control: 6px;
+  --mj-radius-small: 5px;
+
+  /* コントロールの高さ */
+  --mj-control-height: 30px;
+  --mj-row-height: 44px;
+
+  /* 影（Apple のコントロールはごく薄い影と枠線を重ねる） */
+  --mj-shadow-control: 0 0.5px 1px rgba(0, 0, 0, 0.1), 0 0 0 0.5px rgba(0, 0, 0, 0.04);
+  --mj-shadow-raised: 0 4px 16px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.06);
+
+  --mj-font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', 'Hiragino Sans',
     'Hiragino Kaku Gothic ProN', 'Noto Sans JP', Meiryo, sans-serif;
 }
 
@@ -42,12 +66,13 @@ body {
 
 body {
   width: 380px;
-  min-height: 200px;
-  background: var(--fp-bg);
-  color: var(--fp-text);
-  font-family: var(--fp-font);
+  min-height: 220px;
+  background: var(--mj-bg-grouped);
+  color: var(--mj-label);
+  font-family: var(--mj-font);
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.4;
+  letter-spacing: -0.08px;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -61,20 +86,61 @@ input,
 select,
 textarea {
   font: inherit;
+  letter-spacing: inherit;
   color: inherit;
 }
 
-/* キーボード操作時のフォーカスを必ず明示する */
+/* Apple のフォーカスリング：角丸に沿った青いリング */
 :focus-visible {
-  outline: 2px solid var(--fp-focus);
+  outline: 3px solid rgba(0, 122, 255, 0.5);
   outline-offset: 1px;
+  border-radius: var(--mj-radius-small);
 }
 
-/* マウス操作ではアウトラインを出さない */
 :focus:not(:focus-visible) {
   outline: none;
 }
 
 ::placeholder {
-  color: var(--fp-text-faint);
+  color: var(--mj-label-tertiary);
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/*
+ * grouped inset リストの共通形。
+ * 白い角丸カードの中に行を並べ、区切り線は左端をインセットする。
+ */
+.mjCard {
+  background: var(--mj-bg-elevated);
+  border-radius: var(--mj-radius-card);
+  overflow: hidden;
+}
+
+/* セクション見出し（iOS 設定アプリの小さな大文字ラベル） */
+.mjSectionTitle {
+  margin: 0 0 6px;
+  padding: 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.04px;
+  color: var(--mj-label-secondary);
 }

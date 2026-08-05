@@ -9,9 +9,9 @@ type ToggleProps = {
 };
 
 /**
- * 適用状態の ON/OFF スイッチ。
+ * iOS / macOS 標準のスイッチ。
  * `role="switch"` + `aria-checked` でキーボード・支援技術から操作できる。
- * 状態は色だけでなく、つまみの位置と "ON"/"OFF" のテキストでも示す。
+ * 状態は色に加えて「つまみの位置」でも示す。
  */
 export function Toggle({ checked, disabled = false, label, onChange }: ToggleProps) {
   return (
@@ -26,10 +26,7 @@ export function Toggle({ checked, disabled = false, label, onChange }: TogglePro
         onChange(!checked);
       }}
     >
-      <span className={styles.track} aria-hidden="true">
-        <span className={styles.thumb} />
-      </span>
-      <span className={styles.label}>{checked ? 'ON' : 'OFF'}</span>
+      <span className={styles.knob} />
     </button>
   );
 }

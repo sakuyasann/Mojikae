@@ -36,7 +36,10 @@ export function SelectedFonts({ fonts, disabled, onRemove, onMove }: SelectedFon
           <ul className={styles.list}>
             {fonts.map((font, index) => (
               <li key={font.family} className={styles.item}>
-                <span className={styles.order} aria-hidden="true">
+                <span
+                  className={`${styles.order} ${index === 0 ? styles.orderFirst : ''}`}
+                  aria-hidden="true"
+                >
                   {index + 1}
                 </span>
                 <span className={styles.body}>

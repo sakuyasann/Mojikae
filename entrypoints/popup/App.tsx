@@ -294,13 +294,17 @@ export default function App() {
         </p>
       ) : (
         <>
-          <div className={styles.scroll}>
+          {/* 検索はスクロール領域の外に置き、候補が下の内容へ重なるようにする */}
+          <div className={styles.searchBar}>
             <FontSearch
               fonts={catalog}
               selectedFamilies={selectedFamilies}
               disabled={busy !== null || catalog.length === 0}
               onToggle={toggleFont}
             />
+          </div>
+
+          <div className={styles.scroll}>
             <SelectedFonts
               fonts={selectedFonts}
               disabled={busy !== null}

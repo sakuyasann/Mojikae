@@ -1,24 +1,35 @@
 .app {
   display: flex;
   flex-direction: column;
-  max-height: 580px;
+  max-height: 600px;
+  background: var(--mj-bg-grouped);
+}
+
+/*
+ * 検索バーはスクロール領域の外。候補リストを absolute で重ねるため、
+ * ここが位置の基準になり、かつ overflow で切られない。
+ */
+.searchBar {
+  position: relative;
+  z-index: 4;
+  padding: 10px 12px 8px;
+  background: var(--mj-bg-grouped);
+  border-bottom: 0.5px solid var(--mj-separator);
 }
 
 .scroll {
   flex: 1 1 auto;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .loading {
-  padding: 24px 12px;
-  color: var(--fp-text-muted);
+  padding: 40px 16px;
+  color: var(--mj-label-secondary);
   text-align: center;
-}
-
-.footnote {
-  margin: 0;
-  padding: 8px 12px 12px;
-  font-size: 11px;
-  color: var(--fp-text-faint);
-  border-top: 1px solid var(--fp-border);
+  font-size: 13px;
 }
