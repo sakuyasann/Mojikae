@@ -1,3 +1,4 @@
+import { Logo } from './Logo';
 import { Toggle } from './Toggle';
 import styles from './Header.module.css';
 
@@ -12,7 +13,9 @@ export function Header({ applied, disabled, onToggle }: HeaderProps) {
   return (
     <header className={styles.header}>
       <div className={styles.titleGroup}>
-        <h1 className={styles.title}>Mojikae</h1>
+        <h1 className={styles.title}>
+          <Logo size={22} />
+        </h1>
         <span className={`${styles.state} ${applied ? styles.stateOn : ''}`}>
           {applied ? 'このページに適用中' : '未適用'}
         </span>

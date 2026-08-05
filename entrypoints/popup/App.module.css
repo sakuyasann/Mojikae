@@ -1,15 +1,20 @@
+/*
+ * 外枠はスクロールさせない。
+ * スクロールするのは「適用対象」のリストだけにして、入れ子スクロールを避ける。
+ * ヘッダー / 検索 / 選択中 / 最近使用 は自然な高さで積み、
+ * 余った縦幅をすべて適用対象へ渡す（そこだけが伸縮してスクロールする）。
+ */
 .app {
   display: flex;
   flex-direction: column;
-  max-height: 600px;
+  height: 600px;
   background: var(--mj-bg-grouped);
+  overflow: hidden;
 }
 
-/*
- * 検索バーはスクロール領域の外。候補リストを absolute で重ねるため、
- * ここが位置の基準になり、かつ overflow で切られない。
- */
+/* 検索バー。候補リストを absolute で重ねるので位置の基準になる */
 .searchBar {
+  flex: none;
   position: relative;
   z-index: 4;
   padding: 10px 12px 8px;
@@ -17,19 +22,35 @@
   border-bottom: 0.5px solid var(--mj-separator);
 }
 
-.scroll {
+.content {
   flex: 1 1 auto;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: 14px 12px;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
+  padding: 14px 12px;
+  overflow: hidden;
+}
+
+/* 選択中・最近使用は内容ぶんだけ */
+.fixedSection {
+  flex: none;
+}
+
+/* 適用対象だけが余白を受け取って伸縮する */
+.flexSection {
+  flex: 1 1 auto;
+  min-height: 132px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .loading {
-  padding: 40px 16px;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--mj-label-secondary);
-  text-align: center;
   font-size: 13px;
 }

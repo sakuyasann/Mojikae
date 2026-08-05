@@ -12,6 +12,7 @@ type SelectedFontsProps = {
   onRemove: (family: string) => void;
   /** 並び替え。`from` の位置にある項目を `to` の位置へ移す。 */
   onReorder: (from: number, to: number) => void;
+  className?: string;
 };
 
 type DragState = {
@@ -36,7 +37,7 @@ type DragState = {
  * 並び替えはグリップのドラッグに加えて、グリップにフォーカスした状態の
  * 上下キーでも行える（ドラッグはポインタ操作でしか使えないため）。
  */
-export function SelectedFonts({ fonts, disabled, onRemove, onReorder }: SelectedFontsProps) {
+export function SelectedFonts({ fonts, disabled, onRemove, onReorder, className }: SelectedFontsProps) {
   const [drag, setDrag] = useState<DragState | null>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
@@ -116,7 +117,7 @@ export function SelectedFonts({ fonts, disabled, onRemove, onReorder }: Selected
   };
 
   return (
-    <section className={styles.wrapper} aria-labelledby="selected-fonts-label">
+    <section className={`${styles.wrapper} ${className ?? ''}`} aria-labelledby="selected-fonts-label">
       <div className={styles.head}>
         <h2 className={styles.label} id="selected-fonts-label">
           選択中のフォント

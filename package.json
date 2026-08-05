@@ -16,6 +16,7 @@
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
     "fonts:sync": "tsx scripts/sync-google-fonts.ts",
+    "logo:build": "node scripts/build-logo.mjs",
     "postinstall": "wxt prepare"
   },
   "dependencies": {

@@ -14,6 +14,7 @@ type DetectedFontListProps = {
   scannedElements: number;
   onWholePageChange: (next: boolean) => void;
   onGroupToggle: (groupId: string, next: boolean) => void;
+  className?: string;
 };
 
 /**
@@ -30,6 +31,7 @@ export function DetectedFontList({
   scannedElements,
   onWholePageChange,
   onGroupToggle,
+  className,
 }: DetectedFontListProps) {
   const individualDisabled = disabled || wholePage;
 
@@ -49,7 +51,7 @@ export function DetectedFontList({
   }, [groups]);
 
   return (
-    <section className={styles.wrapper} aria-labelledby="detected-fonts-label">
+    <section className={`${styles.wrapper} ${className ?? ''}`} aria-labelledby="detected-fonts-label">
       <div className={styles.head}>
         <h2 className={styles.label} id="detected-fonts-label">
           適用対象

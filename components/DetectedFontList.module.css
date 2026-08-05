@@ -24,11 +24,13 @@
   color: var(--mj-label-tertiary);
 }
 
+/* 唯一のスクロール領域。親（.flexSection）の残り高さいっぱいに伸びる */
 .list {
+  flex: 1 1 auto;
+  min-height: 0;
   margin: 0;
   padding: 0;
   list-style: none;
-  max-height: 240px;
   overflow-y: auto;
   overscroll-behavior: contain;
   background: var(--mj-bg-elevated);
@@ -135,6 +137,10 @@
 }
 
 .empty {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 20px 12px;
   text-align: center;
   background: var(--mj-bg-elevated);

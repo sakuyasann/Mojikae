@@ -386,6 +386,26 @@ data-mojikae-family    上書き前の font-family（個別適用の対象要素
 - 斜体（italic）は読み込みません。MVP では通常体のみを対象にしています。
 - ダークテーマ・サイトごとの設定保存・Google アカウント連携には対応しません。
 
+## ロゴ
+
+| ファイル | 内容 |
+| --- | --- |
+| `assets/logo-mark.svg` | ロゴマーク（スキャン枠 + m + アクセントドット）。アイコン PNG の元データ |
+| `assets/logo-wordmark.svg` | ロゴタイプ。Baloo 2 ExtraBold のアウトラインをパス化したもの |
+| `components/Logo.tsx` | 上記 2 つをインライン展開した React コンポーネント（**自動生成**） |
+| `public/icon/*.png` | 拡張機能アイコン。マークを白い角丸の下地に載せて書き出したもの |
+
+`components/Logo.tsx` は直接編集せず、`assets/` の SVG を直してから再生成してください。
+
+```bash
+pnpm logo:build
+```
+
+インライン展開しているため、ロゴの表示にネットワーク通信もフォント読み込みも発生しません。
+
+ロゴタイプにアウトライン化した書体を使っているのは、ロゴマークの `m` が
+**モノライン・幾何学的・線端が丸い**という骨格を持つためで、同じ性格の Baloo 2 ExtraBold を選んでいます。
+
 ## UI のデザイン方針
 
 Apple の Human Interface Guidelines に沿った macOS / iOS アプリ風の見た目にしています。

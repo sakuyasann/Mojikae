@@ -22,11 +22,11 @@
   min-width: 0;
 }
 
+/* ロゴを入れるので、見出しとしての文字装飾は持たせない */
 .title {
   margin: 0;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.24px;
+  font-size: 0;
+  line-height: 0;
 }
 
 .state {
