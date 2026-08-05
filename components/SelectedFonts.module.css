@@ -33,28 +33,44 @@
   font-size: 13px;
 }
 
+/*
+ * ドラッグ中の行が浮き上がる影を切らないよう、リスト側では overflow を使わず
+ * 先頭・末尾の行に角丸を付けてカード形にする。
+ */
 .list {
   margin: 0;
   padding: 0;
   list-style: none;
-  background: var(--mj-bg-elevated);
-  border-radius: var(--mj-radius-card);
-  overflow: hidden;
+  position: relative;
 }
 
 .item {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 7px 8px 7px 12px;
+  gap: 6px;
+  padding: 7px 6px 7px 4px;
   min-height: 48px;
+  background: var(--mj-bg-elevated);
+  transition: transform 220ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.list > li:first-of-type .item {
+  border-radius: var(--mj-radius-card) var(--mj-radius-card) 0 0;
+}
+
+.list > li:last-of-type .item {
+  border-radius: 0 0 var(--mj-radius-card) var(--mj-radius-card);
+}
+
+.list > li:only-of-type .item {
+  border-radius: var(--mj-radius-card);
 }
 
 .item::after {
   content: '';
   position: absolute;
-  left: 12px;
+  left: 44px;
   right: 0;
   bottom: 0;
   height: 0.5px;
@@ -63,6 +79,55 @@
 
 .list > li:last-of-type .item::after {
   display: none;
+}
+
+/* 掴んでいる行は持ち上がって見せる */
+.itemDragging {
+  z-index: 3;
+  border-radius: var(--mj-radius-card);
+  box-shadow: var(--mj-shadow-raised);
+  transform-origin: center;
+}
+
+.itemDragging::after {
+  display: none;
+}
+
+/* 並び替えハンドル */
+.grip {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 34px;
+  padding: 0 4px;
+  border: none;
+  border-radius: var(--mj-radius-control);
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+}
+
+.grip:not(:disabled):hover {
+  background: var(--mj-fill-quaternary);
+}
+
+.grip:active {
+  cursor: grabbing;
+}
+
+.grip:disabled {
+  cursor: default;
+}
+
+.gripIcon {
+  width: 12px;
+  height: 12px;
+  color: var(--mj-label-tertiary);
+}
+
+.grip:disabled .gripIcon {
+  opacity: 0.4;
 }
 
 /* 優先順位。先頭が最優先 */
@@ -106,22 +171,17 @@
   color: var(--mj-label-secondary);
 }
 
-.controls {
-  display: flex;
-  gap: 2px;
+/* 削除ボタン */
+.remove {
   flex: none;
-}
-
-/* 丸いアイコンボタン（macOS のインラインコントロール相当） */
-.iconButton {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   padding: 0;
   border: none;
   border-radius: 50%;
   background: transparent;
-  color: var(--mj-accent);
-  font-size: 13px;
+  color: var(--mj-red);
+  font-size: 15px;
   line-height: 1;
   cursor: pointer;
   display: flex;
@@ -129,18 +189,13 @@
   justify-content: center;
 }
 
-.iconButton:not(:disabled):hover {
-  background: var(--mj-fill-quaternary);
+.remove:not(:disabled):hover {
+  background: rgba(255, 59, 48, 0.1);
 }
 
-.iconButton:disabled {
+.remove:disabled {
   cursor: default;
   color: var(--mj-label-tertiary);
-}
-
-.remove {
-  color: var(--mj-red);
-  font-size: 14px;
 }
 
 /* 生成される font-family 値 */
@@ -159,5 +214,12 @@
 .hint {
   margin: 6px 4px 0;
   font-size: 11px;
+  line-height: 1.5;
   color: var(--mj-label-tertiary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item {
+    transition: none;
+  }
 }

@@ -132,15 +132,14 @@ export default function App() {
   }, []);
 
   /** 優先順位の入れ替え。先頭ほど優先される。 */
-  const moveFont = useCallback((family: string, direction: -1 | 1) => {
+  const reorderFonts = useCallback((from: number, to: number) => {
     setSelectedFonts((current) => {
-      const index = current.findIndex((entry) => entry.family === family);
-      const next = index + direction;
-      if (index < 0 || next < 0 || next >= current.length) return current;
+      if (from === to) return current;
+      if (from < 0 || to < 0 || from >= current.length || to >= current.length) return current;
       const updated = [...current];
-      const [moved] = updated.splice(index, 1);
+      const [moved] = updated.splice(from, 1);
       if (moved === undefined) return current;
-      updated.splice(next, 0, moved);
+      updated.splice(to, 0, moved);
       return updated;
     });
   }, []);
@@ -309,7 +308,7 @@ export default function App() {
               fonts={selectedFonts}
               disabled={busy !== null}
               onRemove={removeFont}
-              onMove={moveFont}
+              onReorder={reorderFonts}
             />
             <RecentFonts
               families={recent}
