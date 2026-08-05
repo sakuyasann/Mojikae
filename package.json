@@ -1,6 +1,6 @@
 {
   "name": "mojikae",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "現在のタブで使われているフォントを検出し、Google Fonts へ一時的に上書きして比較できるブラウザ拡張機能",
   "type": "module",
