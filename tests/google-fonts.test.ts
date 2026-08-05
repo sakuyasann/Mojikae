@@ -2,11 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { countMatches, isIconFont, mergeRecentFonts, searchFonts } from '../lib/google-fonts';
 import type { GoogleFont } from '../types/google-font';
 
-const font = (family: string, subsets: string[] = ['latin']): GoogleFont => ({
+const font = (family: string, subsets: string[] = ['latin'], popularity?: number): GoogleFont => ({
   family,
   category: 'sans-serif',
   subsets,
   variants: ['regular'],
+  ...(popularity === undefined ? {} : { popularity }),
 });
 
 const CATALOG: GoogleFont[] = [
@@ -40,6 +41,24 @@ describe('searchFonts', () => {
   it('前方一致を部分一致より優先する', () => {
     const result = searchFonts(CATALOG, 'plex').map((item) => item.font.family);
     expect(result).toEqual(['IBM Plex Sans JP']);
+  });
+
+  it('同じ優先度なら人気順に並べる', () => {
+    const catalog = [
+      font('Zeta Sans', ['latin'], 300),
+      font('Alpha Sans', ['latin'], 100),
+      font('Mid Sans', ['latin'], 200),
+    ];
+    expect(searchFonts(catalog, 'sans', 100).map((i) => i.font.family)).toEqual([
+      'Alpha Sans',
+      'Mid Sans',
+      'Zeta Sans',
+    ]);
+  });
+
+  it('人気順が無いフォントは後ろへ回す', () => {
+    const catalog = [font('No Rank', ['latin']), font('Ranked', ['latin'], 500)];
+    expect(searchFonts(catalog, '', 100).map((i) => i.font.family)).toEqual(['Ranked', 'No Rank']);
   });
 
   it('表示件数を制限する', () => {

@@ -91,7 +91,8 @@ function readApiKey(): string {
 async function fetchWebfonts(apiKey: string): Promise<ApiWebfont[]> {
   const url = new URL(API_ENDPOINT);
   url.searchParams.set('key', apiKey);
-  url.searchParams.set('sort', 'alpha');
+  // 人気順で取得し、返ってきた並び順を popularity として保持する
+  url.searchParams.set('sort', 'popularity');
   // capability=VF を付けると可変フォントの axes が返る
   url.searchParams.set('capability', 'VF');
 
@@ -231,7 +232,7 @@ function normalizeLastModified(raw: unknown, family: string): string | undefined
   return raw;
 }
 
-function toGoogleFont(item: ApiWebfont): GoogleFont {
+function toGoogleFont(item: ApiWebfont, popularity: number): GoogleFont {
   const family = typeof item.family === 'string' ? item.family.trim() : '';
   if (family === '') {
     throw new SyncError('family が空のエントリが含まれています。');
@@ -249,6 +250,8 @@ function toGoogleFont(item: ApiWebfont): GoogleFont {
   const lastModified = normalizeLastModified(item.lastModified, family);
   if (lastModified !== undefined) font.lastModified = lastModified;
 
+  font.popularity = popularity;
+
   return font;
 }
 
@@ -257,7 +260,8 @@ export function buildCatalog(items: ApiWebfont[], generatedAt: string): GoogleFo
   const fonts: GoogleFont[] = [];
 
   for (const item of items) {
-    const font = toGoogleFont(item);
+    // items は sort=popularity の並びなので、その位置がそのまま順位になる
+    const font = toGoogleFont(item, seen.size + 1);
     if (seen.has(font.family)) {
       // API 側の重複は無視する（同じ family が 2 度返ることがある）
       continue;
@@ -302,11 +306,15 @@ async function main(): Promise<void> {
 
   const japaneseCount = catalog.fonts.filter((font) => font.subsets.includes('japanese')).length;
   const variableCount = catalog.fonts.filter((font) => font.axes !== undefined).length;
+  const mostPopular = [...catalog.fonts].sort(
+    (a, b) => (a.popularity ?? Infinity) - (b.popularity ?? Infinity),
+  )[0];
 
   console.log(`data/google-fonts.json を更新しました。`);
   console.log(`  総フォント数    : ${catalog.fonts.length}`);
   console.log(`  日本語対応      : ${japaneseCount}`);
   console.log(`  可変フォント    : ${variableCount}`);
+  console.log(`  最も人気        : ${mostPopular?.family ?? '(不明)'}`);
   console.log(`  generatedAt     : ${catalog.generatedAt}`);
 }
 

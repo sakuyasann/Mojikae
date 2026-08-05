@@ -65,7 +65,7 @@ function toSearchItem(font: GoogleFont): FontSearchItem {
  * 並び順:
  *   1. 日本語対応フォントを優先
  *   2. 前方一致を部分一致より優先
- *   3. family 名の昇順
+ *   3. 人気順（Google Fonts の popularity。同順位なら family 名の昇順）
  */
 export function searchFonts(
   fonts: GoogleFont[],
@@ -92,6 +92,10 @@ export function searchFonts(
     const bJapanese = isJapaneseFont(b.font);
     if (aJapanese !== bJapanese) return aJapanese ? -1 : 1;
     if (a.startsWith !== b.startsWith) return a.startsWith ? -1 : 1;
+    // popularity は 1 が最も人気。持たないフォントは最後に回す。
+    const aRank = a.font.popularity ?? Number.MAX_SAFE_INTEGER;
+    const bRank = b.font.popularity ?? Number.MAX_SAFE_INTEGER;
+    if (aRank !== bRank) return aRank - bRank;
     return a.font.family.localeCompare(b.font.family, 'en');
   });
 

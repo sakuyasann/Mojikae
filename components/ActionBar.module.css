@@ -54,6 +54,15 @@
   background: var(--mj-fill-quaternary);
 }
 
+/* 「解除」は適用を取り消す操作なので、Apple の慣習にならって赤にする */
+.destructive {
+  color: var(--mj-red);
+}
+
+.destructive:not(:disabled):hover {
+  background: rgba(255, 59, 48, 0.1);
+}
+
 .secondary:disabled {
   color: var(--mj-label-tertiary);
   cursor: not-allowed;

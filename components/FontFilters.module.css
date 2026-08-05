@@ -66,12 +66,12 @@
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: var(--mj-accent);
+  color: var(--mj-red);
   font-size: 12px;
   cursor: pointer;
   white-space: nowrap;
 }
 
 .reset:hover {
-  background: var(--mj-fill-quaternary);
+  background: rgba(255, 59, 48, 0.1);
 }

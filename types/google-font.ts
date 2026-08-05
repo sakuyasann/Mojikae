@@ -33,6 +33,12 @@ export type GoogleFont = {
   axes?: GoogleFontAxis[];
   /** `YYYY-MM-DD` 形式。 */
   lastModified?: string;
+  /**
+   * 人気順の順位（1 が最も人気）。
+   * Developer API へ `sort=popularity` で問い合わせたときの並び順から採番する。
+   * JSON 自体は family 名でソートするので、順序情報はこのフィールドが持つ。
+   */
+  popularity?: number;
 };
 
 export type GoogleFontsCatalog = {

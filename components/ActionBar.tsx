@@ -47,7 +47,7 @@ export function ActionBar({
         </button>
         <button
           type="button"
-          className={`${styles.button} ${styles.secondary}`}
+          className={`${styles.button} ${styles.secondary} ${styles.destructive}`}
           disabled={releaseDisabled}
           onClick={onRelease}
         >

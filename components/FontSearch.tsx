@@ -1,4 +1,4 @@
-import { useId, useMemo, useState, type KeyboardEvent } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { SEARCH_RESULT_LIMIT } from '../lib/constants';
 import { EMPTY_FILTER, type FontFilter } from '../lib/font-filters';
 import { countMatches, searchFonts } from '../lib/google-fonts';
@@ -28,6 +28,7 @@ export function FontSearch({ fonts, selectedFamilies, disabled, onToggle }: Font
   const [focused, setFocused] = useState(false);
   const [rawActiveIndex, setActiveIndex] = useState(0);
   const [filter, setFilter] = useState<FontFilter>(EMPTY_FILTER);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   // useId() は `«r0»` のような CSS セレクタで使えない文字を含むので英数字だけに落とす
   const rawId = useId();
   const listId = `fp${rawId.replace(/[^a-zA-Z0-9]/g, '')}`;
@@ -85,6 +86,24 @@ export function FontSearch({ fonts, selectedFamilies, disabled, onToggle }: Font
     }
   };
 
+  /*
+   * 候補パネルを閉じる条件は「外側を押したとき」だけにする。
+   * 入力欄の blur で閉じると、パネル内の絞り込み（select）を押した瞬間に
+   * パネルごと消えてしまい操作できない。
+   */
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (target instanceof Node && wrapperRef.current?.contains(target)) return;
+      setOpen(false);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+    };
+  }, [open]);
+
   const handleFilterChange = (next: FontFilter) => {
     setFilter(next);
     setActiveIndex(0);
@@ -94,7 +113,7 @@ export function FontSearch({ fonts, selectedFamilies, disabled, onToggle }: Font
   const showList = open && !disabled;
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} ref={wrapperRef}>
       <div className={`${styles.field} ${focused ? styles.fieldFocused : ''}`}>
         {/* SF Symbols の magnifyingglass 相当 */}
         <svg className={styles.icon} viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -130,7 +149,6 @@ export function FontSearch({ fonts, selectedFamilies, disabled, onToggle }: Font
           }}
           onBlur={() => {
             setFocused(false);
-            setOpen(false);
           }}
           onKeyDown={handleKeyDown}
         />
