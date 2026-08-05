@@ -60,17 +60,24 @@ export function SelectedFonts({ fonts, disabled, onRemove, onReorder }: Selected
     [disabled, fonts.length],
   );
 
-  const handlePointerMove = useCallback((event: PointerEvent<HTMLButtonElement>) => {
-    setDrag((current) => {
-      if (current === null || current.pointerId !== event.pointerId) return current;
-      const offsetY = event.clientY - current.startY;
-      // 半行ぶん動いたら入れ替え位置を 1 つずらす
-      const shift = Math.round(offsetY / current.rowHeight);
-      const to = Math.min(Math.max(current.from + shift, 0), fonts.length - 1);
-      if (to === current.to && offsetY === current.offsetY) return current;
-      return { ...current, offsetY, to };
-    });
-  }, [fonts.length]);
+  const handlePointerMove = useCallback(
+    (event: PointerEvent<HTMLButtonElement>) => {
+      setDrag((current) => {
+        if (current === null || current.pointerId !== event.pointerId) return current;
+
+        // リストの外まで行かないよう、掴んだ行が動ける範囲へ収める
+        const minOffset = -current.from * current.rowHeight;
+        const maxOffset = (fonts.length - 1 - current.from) * current.rowHeight;
+        const offsetY = Math.min(Math.max(event.clientY - current.startY, minOffset), maxOffset);
+
+        // 半行ぶん動いたら入れ替え位置を 1 つずらす
+        const to = current.from + Math.round(offsetY / current.rowHeight);
+        if (to === current.to && offsetY === current.offsetY) return current;
+        return { ...current, offsetY, to };
+      });
+    },
+    [fonts.length],
+  );
 
   const endDrag = useCallback(() => {
     setDrag((current) => {
@@ -121,17 +128,14 @@ export function SelectedFonts({ fonts, disabled, onRemove, onReorder }: Selected
         <p className={styles.empty}>フォント未選択</p>
       ) : (
         <>
-          <ul className={styles.list} ref={listRef}>
+          <ul className={`${styles.list} ${drag !== null ? styles.listDragging : ''}`} ref={listRef}>
             {fonts.map((font, index) => {
               const isDragging = drag?.from === index;
               return (
                 <li key={font.family}>
                   <div
                     className={`${styles.item} ${isDragging ? styles.itemDragging : ''}`}
-                    style={{
-                      transform: rowTransform(index),
-                      transition: isDragging ? 'none' : undefined,
-                    }}
+                    style={{ transform: rowTransform(index) }}
                   >
                     <button
                       type="button"
