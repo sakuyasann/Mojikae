@@ -1,6 +1,7 @@
 import { browser } from 'wxt/browser';
 import { RECENT_FONTS_LIMIT, SEARCH_RESULT_LIMIT } from './constants';
 import { ExtensionError } from './extension-errors';
+import { EMPTY_FILTER, matchesFilter, type FontFilter } from './font-filters';
 import { isIconFontName } from './icon-font-detector';
 import { JAPANESE_SUBSET, type FontSearchItem, type GoogleFont, type GoogleFontsCatalog } from '../types/google-font';
 
@@ -59,6 +60,7 @@ function toSearchItem(font: GoogleFont): FontSearchItem {
 
 /**
  * フォント名の部分一致検索（大文字小文字を区別しない）。
+ * 言語サブセットと種類での絞り込みを併用できる。
  *
  * 並び順:
  *   1. 日本語対応フォントを優先
@@ -69,13 +71,15 @@ export function searchFonts(
   fonts: GoogleFont[],
   query: string,
   limit: number = SEARCH_RESULT_LIMIT,
+  filter: FontFilter = EMPTY_FILTER,
 ): FontSearchItem[] {
   const normalizedQuery = query.trim().toLowerCase();
 
-  const matched =
-    normalizedQuery === ''
-      ? fonts
-      : fonts.filter((font) => font.family.toLowerCase().includes(normalizedQuery));
+  const matched = fonts.filter(
+    (font) =>
+      matchesFilter(font, filter) &&
+      (normalizedQuery === '' || font.family.toLowerCase().includes(normalizedQuery)),
+  );
 
   const scored = matched.map((font) => {
     const lower = font.family.toLowerCase();
@@ -92,6 +96,19 @@ export function searchFonts(
   });
 
   return scored.slice(0, limit).map((entry) => toSearchItem(entry.font));
+}
+
+/** 絞り込みと検索語に一致する総数（表示件数で切り詰める前）。 */
+export function countMatches(fonts: GoogleFont[], query: string, filter: FontFilter = EMPTY_FILTER): number {
+  const normalizedQuery = query.trim().toLowerCase();
+  return fonts.reduce(
+    (total, font) =>
+      matchesFilter(font, filter) &&
+      (normalizedQuery === '' || font.family.toLowerCase().includes(normalizedQuery))
+        ? total + 1
+        : total,
+    0,
+  );
 }
 
 export function findFontByFamily(fonts: GoogleFont[], family: string): GoogleFont | undefined {

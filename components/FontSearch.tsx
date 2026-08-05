@@ -1,7 +1,9 @@
 import { useId, useMemo, useState, type KeyboardEvent } from 'react';
 import { SEARCH_RESULT_LIMIT } from '../lib/constants';
-import { searchFonts } from '../lib/google-fonts';
+import { EMPTY_FILTER, isFilterActive, type FontFilter } from '../lib/font-filters';
+import { countMatches, searchFonts } from '../lib/google-fonts';
 import type { GoogleFont } from '../types/google-font';
+import { FontFilters } from './FontFilters';
 import { FontSearchResult } from './FontSearchResult';
 import styles from './FontSearch.module.css';
 
@@ -25,22 +27,16 @@ export function FontSearch({ fonts, selectedFamilies, disabled, onToggle }: Font
   const [open, setOpen] = useState(false);
   const [focused, setFocused] = useState(false);
   const [rawActiveIndex, setActiveIndex] = useState(0);
+  const [filter, setFilter] = useState<FontFilter>(EMPTY_FILTER);
   // useId() は `«r0»` のような CSS セレクタで使えない文字を含むので英数字だけに落とす
   const rawId = useId();
   const listId = `fp${rawId.replace(/[^a-zA-Z0-9]/g, '')}`;
 
-  const matchedCount = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    if (normalized === '') return fonts.length;
-    return fonts.reduce(
-      (count, font) => (font.family.toLowerCase().includes(normalized) ? count + 1 : count),
-      0,
-    );
-  }, [fonts, query]);
+  const matchedCount = useMemo(() => countMatches(fonts, query, filter), [fonts, query, filter]);
 
   const items = useMemo(
-    () => searchFonts(fonts, query, SEARCH_RESULT_LIMIT),
-    [fonts, query],
+    () => searchFonts(fonts, query, SEARCH_RESULT_LIMIT, filter),
+    [fonts, query, filter],
   );
 
   // 候補が減って activeIndex がはみ出しても壊れないようにする
@@ -87,6 +83,12 @@ export function FontSearch({ fonts, selectedFamilies, disabled, onToggle }: Font
     if (event.key === 'Tab') {
       setOpen(false);
     }
+  };
+
+  const handleFilterChange = (next: FontFilter) => {
+    setFilter(next);
+    setActiveIndex(0);
+    setOpen(true);
   };
 
   const showList = open && !disabled;
@@ -149,6 +151,8 @@ export function FontSearch({ fonts, selectedFamilies, disabled, onToggle }: Font
         )}
       </div>
 
+      <FontFilters fonts={fonts} filter={filter} disabled={disabled} onChange={handleFilterChange} />
+
       {showList && (
         <FontSearchResult
           listId={listId}
@@ -161,7 +165,11 @@ export function FontSearch({ fonts, selectedFamilies, disabled, onToggle }: Font
         />
       )}
 
-      <p className={styles.hint}>クリックまたは Enter で選択・解除。複数選べます。</p>
+      <p className={styles.hint}>
+        {isFilterActive(filter)
+          ? `絞り込み中：${matchedCount} 件`
+          : 'クリックまたは Enter で選択・解除。複数選べます。'}
+      </p>
     </div>
   );
 }

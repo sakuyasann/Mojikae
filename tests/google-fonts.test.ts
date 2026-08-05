@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isIconFont, mergeRecentFonts, searchFonts } from '../lib/google-fonts';
+import { countMatches, isIconFont, mergeRecentFonts, searchFonts } from '../lib/google-fonts';
 import type { GoogleFont } from '../types/google-font';
 
 const font = (family: string, subsets: string[] = ['latin']): GoogleFont => ({
@@ -48,6 +48,35 @@ describe('searchFonts', () => {
 
   it('空クエリでは全件を対象にする', () => {
     expect(searchFonts(CATALOG, '', 100)).toHaveLength(CATALOG.length);
+  });
+
+  it('言語で絞り込める', () => {
+    const result = searchFonts(CATALOG, '', 100, { subset: 'japanese', category: null });
+    expect(result.map((item) => item.font.family)).toEqual(['IBM Plex Sans JP', 'Noto Sans JP']);
+  });
+
+  it('種類で絞り込める', () => {
+    const result = searchFonts(CATALOG, '', 100, { subset: null, category: 'sans-serif' });
+    expect(result).toHaveLength(CATALOG.length);
+  });
+
+  it('絞り込みと検索語を併用できる', () => {
+    const result = searchFonts(CATALOG, 'noto', 100, { subset: 'japanese', category: null });
+    expect(result.map((item) => item.font.family)).toEqual(['Noto Sans JP']);
+  });
+});
+
+describe('countMatches', () => {
+  it('表示件数で切り詰める前の総数を返す', () => {
+    expect(countMatches(CATALOG, '')).toBe(CATALOG.length);
+  });
+
+  it('絞り込みを反映する', () => {
+    expect(countMatches(CATALOG, '', { subset: 'japanese', category: null })).toBe(2);
+  });
+
+  it('検索語と絞り込みの両方を反映する', () => {
+    expect(countMatches(CATALOG, 'rob', { subset: 'japanese', category: null })).toBe(0);
   });
 
   it('アイコンフォントは検索結果に残しつつ isIconFont を立てる', () => {

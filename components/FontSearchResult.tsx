@@ -1,15 +1,8 @@
 import { useEffect, useRef } from 'react';
+import { CATEGORY_LABELS } from '../lib/font-filters';
 import { loadPreviewFonts, previewFontFamily } from '../lib/font-preview';
-import type { FontSearchItem, GoogleFont, GoogleFontCategory } from '../types/google-font';
+import type { FontSearchItem, GoogleFont } from '../types/google-font';
 import styles from './FontSearchResult.module.css';
-
-const CATEGORY_LABELS: Record<GoogleFontCategory, string> = {
-  serif: 'セリフ',
-  'sans-serif': 'サンセリフ',
-  display: 'ディスプレイ',
-  handwriting: '手書き',
-  monospace: '等幅',
-};
 
 type FontSearchResultProps = {
   listId: string;

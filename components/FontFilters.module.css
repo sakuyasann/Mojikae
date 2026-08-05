@@ -1,0 +1,75 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.field {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* macOS の pop-up button 風。ネイティブ select なのでキーボード操作もそのまま効く */
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 28px;
+  padding: 0 22px 0 9px;
+  border: none;
+  border-radius: 6px;
+  background: var(--mj-bg-elevated);
+  box-shadow: var(--mj-shadow-control);
+  font-size: 12px;
+  letter-spacing: -0.06px;
+  color: var(--mj-label);
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+
+.select:disabled {
+  cursor: not-allowed;
+  color: var(--mj-label-tertiary);
+}
+
+/* 絞り込み中は文字色で分かるようにする（記号だけに頼らない） */
+.selectActive {
+  color: var(--mj-accent);
+  font-weight: 500;
+}
+
+/* SF Symbols の chevron.down 相当 */
+.chevron {
+  position: absolute;
+  top: 50%;
+  right: 7px;
+  width: 9px;
+  height: 9px;
+  margin-top: -4.5px;
+  pointer-events: none;
+  color: var(--mj-label-tertiary);
+}
+
+.selectActive + .chevron {
+  color: var(--mj-accent);
+}
+
+/* 絞り込みを解除するボタン。絞り込み中だけ出す */
+.reset {
+  flex: none;
+  height: 28px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--mj-accent);
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.reset:hover {
+  background: var(--mj-fill-quaternary);
+}
