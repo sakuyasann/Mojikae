@@ -1,0 +1,41 @@
+.message {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--fp-border);
+  background: var(--fp-danger-bg);
+  color: var(--fp-danger);
+  font-size: 12px;
+}
+
+/* 色だけに依存しないよう、記号でもエラーであることを示す */
+.mark {
+  flex: none;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dismiss {
+  flex: none;
+  height: 20px;
+  padding: 0 6px;
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  color: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.blocking {
+  border-bottom: none;
+  min-height: 120px;
+  align-items: center;
+}

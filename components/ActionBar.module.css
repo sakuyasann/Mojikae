@@ -1,0 +1,55 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--fp-border);
+  background: var(--fp-bg);
+  position: sticky;
+  bottom: 0;
+}
+
+.button {
+  height: 34px;
+  padding: 0 12px;
+  background: var(--fp-bg);
+  border: 1px solid var(--fp-border-strong);
+  border-radius: var(--fp-radius);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.button:not(:disabled):hover {
+  border-color: var(--fp-border-active);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  color: var(--fp-text-faint);
+  background: var(--fp-bg-subtle);
+  border-color: var(--fp-border);
+}
+
+.primary {
+  flex: 1 1 auto;
+  font-weight: 600;
+  border-color: var(--fp-border-active);
+  border-width: 1px;
+}
+
+.primary:disabled {
+  border-color: var(--fp-border);
+  font-weight: 500;
+}
+
+.status {
+  margin: 0;
+  padding: 0 12px 10px;
+  font-size: 11px;
+  color: var(--fp-text-muted);
+}
+
+/* 進行中は文字でも状態が分かるようにする（色に依存しない） */
+.statusBusy::before {
+  content: '▸ ';
+}

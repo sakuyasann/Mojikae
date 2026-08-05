@@ -1,0 +1,48 @@
+{
+  "name": "mojikae",
+  "version": "0.1.0",
+  "private": true,
+  "description": "現在のタブで使われているフォントを検出し、Google Fonts へ一時的に上書きして比較できるブラウザ拡張機能",
+  "type": "module",
+  "scripts": {
+    "dev": "wxt",
+    "dev:firefox": "wxt -b firefox",
+    "build": "wxt build",
+    "build:firefox": "wxt build -b firefox",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip -b firefox",
+    "typecheck": "wxt prepare && tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run",
+    "fonts:sync": "tsx scripts/sync-google-fonts.ts",
+    "postinstall": "wxt prepare"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@types/node": "^26.1.2",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@wxt-dev/module-react": "^1.2.2",
+    "eslint": "^9.39.0",
+    "eslint-plugin-react-hooks": "^7.1.0",
+    "globals": "^16.5.0",
+    "prettier": "^3.9.6",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "^8.46.0",
+    "vitest": "^3.2.0",
+    "wxt": "^0.21.0"
+  },
+  "packageManager": "pnpm@10.24.0",
+  "pnpm": {
+    "overrides": {
+      "@vitejs/plugin-react": "^5.2.0"
+    },
+    "onlyBuiltDependencies": ["esbuild"]
+  }
+}

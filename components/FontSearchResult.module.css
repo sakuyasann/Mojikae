@@ -1,0 +1,80 @@
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 190px;
+  overflow-y: auto;
+  border: 1px solid var(--fp-border-strong);
+  border-top: none;
+  border-radius: 0 0 var(--fp-radius) var(--fp-radius);
+  background: var(--fp-bg);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  min-height: 30px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--fp-border);
+}
+
+.option:last-child {
+  border-bottom: none;
+}
+
+.optionActive {
+  background: var(--fp-bg-selected);
+}
+
+/* 選択中は背景色だけに頼らず、左端のバーとチェック記号でも示す */
+.optionSelected {
+  box-shadow: inset 3px 0 0 var(--fp-border-active);
+}
+
+.name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.check {
+  flex: none;
+  font-size: 11px;
+  color: var(--fp-text);
+}
+
+.badge {
+  flex: none;
+  font-size: 10px;
+  line-height: 1.4;
+  padding: 1px 4px;
+  border: 1px solid var(--fp-border-strong);
+  border-radius: 2px;
+  color: var(--fp-text-muted);
+  background: var(--fp-bg-subtle);
+}
+
+.badgeJapanese {
+  border-color: var(--fp-border-active);
+  color: var(--fp-text);
+}
+
+.empty {
+  padding: 10px;
+  color: var(--fp-text-muted);
+  border: 1px solid var(--fp-border-strong);
+  border-top: none;
+  border-radius: 0 0 var(--fp-radius) var(--fp-radius);
+}
+
+.more {
+  padding: 6px 10px;
+  font-size: 11px;
+  color: var(--fp-text-muted);
+  border-top: 1px solid var(--fp-border);
+  background: var(--fp-bg-subtle);
+}

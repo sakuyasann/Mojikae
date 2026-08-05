@@ -1,0 +1,73 @@
+.wrapper {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--fp-border);
+}
+
+.label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fp-text-muted);
+}
+
+.combobox {
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  height: var(--fp-control-height);
+  padding: 0 8px;
+  background: var(--fp-bg);
+  border: 1px solid var(--fp-border-strong);
+  border-radius: var(--fp-radius);
+}
+
+.inputOpen {
+  border-radius: var(--fp-radius) var(--fp-radius) 0 0;
+}
+
+.input:disabled {
+  background: var(--fp-bg-subtle);
+  color: var(--fp-text-faint);
+  cursor: not-allowed;
+}
+
+.selected {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--fp-border-strong);
+  border-left: 3px solid var(--fp-border-active);
+  border-radius: var(--fp-radius);
+  background: var(--fp-bg-subtle);
+}
+
+.selectedEmpty {
+  border-left-color: var(--fp-border);
+  color: var(--fp-text-muted);
+}
+
+.selectedLabel {
+  flex: none;
+  font-size: 11px;
+  color: var(--fp-text-muted);
+}
+
+.selectedName {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.hint {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: var(--fp-text-faint);
+}

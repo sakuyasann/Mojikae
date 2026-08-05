@@ -1,0 +1,305 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ActionBar, type BusyKind } from '../../components/ActionBar';
+import { DetectedFontList } from '../../components/DetectedFontList';
+import { ErrorMessage } from '../../components/ErrorMessage';
+import { FontSearch } from '../../components/FontSearch';
+import { Header } from '../../components/Header';
+import { RecentFonts } from '../../components/RecentFonts';
+import { getActiveTab } from '../../lib/active-tab';
+import { ERROR_MESSAGES, formatErrorMessage, toExtensionError } from '../../lib/extension-errors';
+import { findFontByFamily, loadCatalog, loadRecentFonts, pushRecentFont } from '../../lib/google-fonts';
+import { applyFont, releaseFont, type ApplyTarget } from '../../lib/tab-injector';
+import { scanActiveTab, type TabScanResult } from '../../lib/tab-scanner';
+import { readTabState } from '../../lib/tab-state';
+import type { GoogleFont } from '../../types/google-font';
+import styles from './App.module.css';
+
+/**
+ * ポップアップのオーケストレーション。
+ * ブラウザ API と DOM 走査は lib/ 側に閉じ込め、ここでは状態遷移だけを扱う。
+ */
+export default function App() {
+  const [ready, setReady] = useState(false);
+  /** ページ自体が操作できない場合のエラー。表示したら他の UI は出さない。 */
+  const [fatalError, setFatalError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const [catalog, setCatalog] = useState<GoogleFont[]>([]);
+  const [recent, setRecent] = useState<string[]>([]);
+  const [selectedFont, setSelectedFont] = useState<GoogleFont | null>(null);
+
+  const [scan, setScan] = useState<TabScanResult | null>(null);
+  const [wholePage, setWholePage] = useState(true);
+  const [selectedGroupIds, setSelectedGroupIds] = useState<ReadonlySet<string>>(() => new Set());
+
+  const [applied, setApplied] = useState(false);
+  const [busy, setBusy] = useState<BusyKind>(null);
+
+  const tabIdRef = useRef<number | null>(null);
+  /** 連打対策。state の反映を待たずに二重実行を弾く。 */
+  const busyRef = useRef(false);
+  const initializedRef = useRef(false);
+
+  const groups = useMemo(() => scan?.groups ?? [], [scan]);
+
+  const runScan = useCallback(async (tabId: number) => {
+    setBusy('scan');
+    try {
+      const result = await scanActiveTab(tabId);
+      setScan(result);
+      // 消えた font-family の選択は落とす（ID は font-family から決まるので再スキャンでも安定）
+      const availableIds = new Set(result.groups.map((group) => group.id));
+      setSelectedGroupIds((current) => new Set([...current].filter((id) => availableIds.has(id))));
+    } catch (caught) {
+      setError(formatErrorMessage(toExtensionError(caught, 'SCAN_FAILED')));
+    } finally {
+      setBusy(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    // StrictMode の二重実行で 2 回スキャンしないようにする
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+
+    const initialize = async () => {
+      let tabId: number;
+      try {
+        const tab = await getActiveTab();
+        tabId = tab.id;
+        tabIdRef.current = tab.id;
+      } catch (caught) {
+        setFatalError(formatErrorMessage(toExtensionError(caught, 'UNSUPPORTED_PAGE')));
+        setReady(true);
+        return;
+      }
+
+      let fonts: GoogleFont[] = [];
+      try {
+        fonts = await loadCatalog();
+        setCatalog(fonts);
+      } catch (caught) {
+        setError(formatErrorMessage(toExtensionError(caught, 'CATALOG_LOAD_FAILED')));
+      }
+
+      try {
+        setRecent(await loadRecentFonts());
+      } catch (caught) {
+        // 最近使用したフォントが読めなくても本体機能は使えるので続行する
+        console.error('[Mojikae] 最近使用したフォントの読み込みに失敗しました', caught);
+      }
+
+      // ページ内の data 属性から適用状態を復元する。
+      // ここで注入できないページは、以降の操作もすべて失敗するので致命扱いにする。
+      try {
+        const state = await readTabState(tabId);
+        if (state.active) {
+          setApplied(true);
+          setWholePage(state.mode === 'page');
+          setSelectedGroupIds(new Set(state.groupIds));
+          if (state.fontFamily !== null) {
+            const restored = findFontByFamily(fonts, state.fontFamily);
+            if (restored) setSelectedFont(restored);
+          }
+        }
+      } catch (caught) {
+        setFatalError(formatErrorMessage(toExtensionError(caught, 'UNSUPPORTED_PAGE')));
+        setReady(true);
+        return;
+      }
+
+      setReady(true);
+      await runScan(tabId);
+    };
+
+    void initialize();
+  }, [runScan]);
+
+  const selectFont = useCallback((font: GoogleFont) => {
+    setSelectedFont(font);
+    setError(null);
+  }, []);
+
+  const selectRecentFont = useCallback(
+    (family: string) => {
+      const font = findFontByFamily(catalog, family);
+      if (!font) {
+        setError(ERROR_MESSAGES.FONT_NOT_FOUND);
+        return;
+      }
+      selectFont(font);
+    },
+    [catalog, selectFont],
+  );
+
+  const handleWholePageChange = useCallback(
+    (next: boolean) => {
+      setWholePage(next);
+      if (next) {
+        // ページ全体を選んだら個別選択はクリアする
+        setSelectedGroupIds(new Set());
+        return;
+      }
+      // 個別選択へ切り替えたときの初期値。アイコンフォントの可能性がある項目は未選択にする。
+      setSelectedGroupIds((current) => {
+        if (current.size > 0) return current;
+        return new Set(groups.filter((group) => !group.isPossibleIconFont).map((group) => group.id));
+      });
+    },
+    [groups],
+  );
+
+  const handleGroupToggle = useCallback((groupId: string, next: boolean) => {
+    setSelectedGroupIds((current) => {
+      const updated = new Set(current);
+      if (next) {
+        updated.add(groupId);
+      } else {
+        updated.delete(groupId);
+      }
+      return updated;
+    });
+  }, []);
+
+  const applyNow = useCallback(async () => {
+    if (busyRef.current) return;
+    const tabId = tabIdRef.current;
+    if (tabId === null || !selectedFont) return;
+
+    const target: ApplyTarget = wholePage
+      ? { mode: 'page' }
+      : {
+          mode: 'groups',
+          groups: groups
+            .filter((group) => selectedGroupIds.has(group.id))
+            .map((group) => ({ id: group.id, rawFamilies: group.rawFamilies })),
+        };
+
+    if (target.mode === 'groups' && target.groups.length === 0) {
+      setError(ERROR_MESSAGES.NO_TARGET_SELECTED);
+      return;
+    }
+
+    busyRef.current = true;
+    setBusy('apply');
+    setError(null);
+    try {
+      await applyFont(tabId, selectedFont, target);
+      setApplied(true);
+      setRecent(await pushRecentFont(selectedFont.family));
+    } catch (caught) {
+      setApplied(false);
+      setError(formatErrorMessage(toExtensionError(caught, 'APPLY_FAILED')));
+    } finally {
+      busyRef.current = false;
+      setBusy(null);
+    }
+  }, [groups, selectedFont, selectedGroupIds, wholePage]);
+
+  const releaseNow = useCallback(async () => {
+    if (busyRef.current) return;
+    const tabId = tabIdRef.current;
+    if (tabId === null) return;
+
+    busyRef.current = true;
+    setBusy('release');
+    setError(null);
+    try {
+      await releaseFont(tabId);
+      setApplied(false);
+    } catch (caught) {
+      setError(formatErrorMessage(toExtensionError(caught, 'RELEASE_FAILED')));
+    } finally {
+      busyRef.current = false;
+      setBusy(null);
+    }
+  }, []);
+
+  const rescan = useCallback(() => {
+    const tabId = tabIdRef.current;
+    if (tabId === null || busyRef.current) return;
+    void runScan(tabId);
+  }, [runScan]);
+
+  const hasTarget = wholePage || selectedGroupIds.size > 0;
+  const canApply =
+    ready && fatalError === null && busy === null && selectedFont !== null && hasTarget && catalog.length > 0;
+
+  if (fatalError !== null) {
+    return (
+      <div className={styles.app}>
+        <Header applied={false} disabled onToggle={() => undefined} />
+        <ErrorMessage message={fatalError} blocking />
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.app}>
+      <Header
+        applied={applied}
+        disabled={busy !== null || (!applied && !canApply)}
+        onToggle={(next) => {
+          void (next ? applyNow() : releaseNow());
+        }}
+      />
+
+      {error !== null && (
+        <ErrorMessage
+          message={error}
+          onDismiss={() => {
+            setError(null);
+          }}
+        />
+      )}
+
+      {!ready ? (
+        <p className={styles.loading} role="status">
+          読み込み中…
+        </p>
+      ) : (
+        <>
+          <div className={styles.scroll}>
+            <FontSearch
+              fonts={catalog}
+              selectedFont={selectedFont}
+              disabled={busy !== null || catalog.length === 0}
+              onSelect={selectFont}
+            />
+            <RecentFonts
+              families={recent}
+              selectedFamily={selectedFont?.family ?? null}
+              disabled={busy !== null || catalog.length === 0}
+              onSelect={selectRecentFont}
+            />
+            <DetectedFontList
+              groups={groups}
+              wholePage={wholePage}
+              selectedGroupIds={selectedGroupIds}
+              scanning={busy === 'scan'}
+              disabled={busy !== null}
+              truncated={scan?.truncated ?? false}
+              scannedElements={scan?.scannedElements ?? 0}
+              onWholePageChange={handleWholePageChange}
+              onGroupToggle={handleGroupToggle}
+            />
+          </div>
+
+          <ActionBar
+            busy={busy}
+            applyDisabled={!canApply}
+            releaseDisabled={busy !== null || !applied}
+            rescanDisabled={busy !== null}
+            onApply={() => {
+              void applyNow();
+            }}
+            onRelease={() => {
+              void releaseNow();
+            }}
+            onRescan={rescan}
+          />
+        </>
+      )}
+    </div>
+  );
+}

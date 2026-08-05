@@ -1,0 +1,111 @@
+name: Sync Google Fonts catalog
+
+# 週 1 回、月曜の日本時間 9:00（= UTC 日曜 24:00 / 月曜 00:00）に実行する。
+# 手動実行にも対応。
+on:
+  schedule:
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+# 必要最小限の権限のみ。
+#   contents: write       … 更新ブランチを push するため
+#   pull-requests: write  … 自動 PR を作成するため
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-google-fonts
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # カタログ更新の前後で件数を比較するため、更新前の状態を控えておく
+      - name: Snapshot current catalog
+        run: cp data/google-fonts.json /tmp/google-fonts.before.json
+
+      - name: Sync catalog
+        env:
+          GOOGLE_FONTS_API_KEY: ${{ secrets.GOOGLE_FONTS_API_KEY }}
+        run: pnpm fonts:sync
+
+      # generatedAt は毎回変わるので、フォント本体に差分があるときだけ PR を作る
+      - name: Check for meaningful changes
+        id: diff
+        run: node scripts/diff-google-fonts.mjs /tmp/google-fonts.before.json data/google-fonts.json
+
+      - name: Type check
+        if: steps.diff.outputs.changed == 'true'
+        run: pnpm typecheck
+
+      - name: Lint
+        if: steps.diff.outputs.changed == 'true'
+        run: pnpm lint
+
+      - name: Test
+        if: steps.diff.outputs.changed == 'true'
+        run: pnpm test
+
+      - name: Build (Chromium)
+        if: steps.diff.outputs.changed == 'true'
+        run: pnpm build
+
+      - name: Build (Firefox)
+        if: steps.diff.outputs.changed == 'true'
+        run: pnpm build:firefox
+
+      - name: Create pull request
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          add-paths: data/google-fonts.json
+          branch: chore/update-google-fonts-catalog
+          delete-branch: true
+          commit-message: 'chore: update Google Fonts catalog'
+          title: 'chore: update Google Fonts catalog'
+          body: |
+            Google Fonts カタログ（`data/google-fonts.json`）の自動更新です。
+
+            `scripts/sync-google-fonts.ts` が Google Fonts Developer API から取得し、
+            拡張機能に必要な情報だけへ整形して生成しています。API キーはこの PR には含まれません。
+
+            | 項目 | 件数 |
+            | --- | ---: |
+            | 追加されたフォント | ${{ steps.diff.outputs.added }} |
+            | 削除されたフォント | ${{ steps.diff.outputs.removed }} |
+            | 更新されたフォント | ${{ steps.diff.outputs.updated }} |
+            | 総フォント数 | ${{ steps.diff.outputs.total }} |
+
+            - 更新日時: `${{ steps.diff.outputs.generated_at }}`
+            - 型チェック / Lint / テスト / Chromium ビルド / Firefox ビルドは実行済みです。
+
+            <details>
+            <summary>追加されたフォント</summary>
+
+            ${{ steps.diff.outputs.added_list }}
+
+            </details>
+
+            <details>
+            <summary>削除されたフォント</summary>
+
+            ${{ steps.diff.outputs.removed_list }}
+
+            </details>

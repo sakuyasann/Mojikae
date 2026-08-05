@@ -1,0 +1,133 @@
+.wrapper {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--fp-border);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fp-text-muted);
+}
+
+.meta {
+  font-size: 11px;
+  color: var(--fp-text-faint);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 216px;
+  overflow-y: auto;
+  border: 1px solid var(--fp-border);
+  border-radius: var(--fp-radius);
+}
+
+.row {
+  border-bottom: 1px solid var(--fp-border);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.rowWhole {
+  background: var(--fp-bg-subtle);
+}
+
+.rowSelected {
+  background: var(--fp-bg-selected);
+}
+
+.rowDisabled {
+  color: var(--fp-text-faint);
+}
+
+.control {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 7px 9px;
+  min-height: 34px;
+  cursor: pointer;
+}
+
+.rowDisabled .control {
+  cursor: not-allowed;
+}
+
+.checkbox {
+  margin: 2px 0 0;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  accent-color: #18181b;
+}
+
+.body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.nameWhole {
+  font-weight: 600;
+}
+
+.count {
+  display: block;
+  font-size: 11px;
+  color: var(--fp-text-muted);
+}
+
+/* 同名グループが並ぶときだけ出す font-family 全体 */
+.stack {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  color: var(--fp-text-faint);
+}
+
+.iconNote {
+  display: inline-block;
+  margin-top: 3px;
+  padding: 1px 4px;
+  font-size: 10px;
+  line-height: 1.4;
+  border: 1px solid var(--fp-warn-border);
+  border-radius: 2px;
+  background: var(--fp-warn-bg);
+  color: #93602a;
+}
+
+.empty {
+  padding: 10px;
+  border: 1px solid var(--fp-border);
+  border-radius: var(--fp-radius);
+  color: var(--fp-text-muted);
+}
+
+.truncated {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: var(--fp-text-muted);
+}

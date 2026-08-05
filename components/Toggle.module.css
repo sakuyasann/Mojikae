@@ -1,0 +1,70 @@
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 6px 0 4px;
+  background: var(--fp-bg);
+  border: 1px solid var(--fp-border-strong);
+  border-radius: var(--fp-radius);
+  cursor: pointer;
+}
+
+.toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.toggle:not(:disabled):hover {
+  border-color: var(--fp-border-active);
+}
+
+/* トラック。色だけでなく、つまみの位置と ON/OFF の文字でも状態が分かるようにする */
+.track {
+  position: relative;
+  width: 26px;
+  height: 14px;
+  border: 1px solid var(--fp-border-strong);
+  border-radius: 2px;
+  background: var(--fp-bg-subtle);
+  flex: none;
+}
+
+.thumb {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 10px;
+  height: 10px;
+  background: var(--fp-text-faint);
+  transition: left 80ms linear;
+}
+
+.toggleOn .track {
+  border-color: var(--fp-border-active);
+  background: var(--fp-bg);
+}
+
+.toggleOn .thumb {
+  left: 13px;
+  background: var(--fp-border-active);
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--fp-text-muted);
+  min-width: 24px;
+  text-align: left;
+}
+
+.toggleOn .label {
+  color: var(--fp-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thumb {
+    transition: none;
+  }
+}
