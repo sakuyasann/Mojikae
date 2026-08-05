@@ -17,7 +17,7 @@ SaaS・管理画面・Web サイトのフォント選定を主な用途として
 | UI | React 19 / TypeScript（strict） |
 | パッケージマネージャ | pnpm |
 | マニフェスト | Manifest V3（Chromium / Firefox とも） |
-| 対応ブラウザ | Chrome, Edge などの Chromium 系, Firefox 128+ |
+| 対応ブラウザ | Chrome, Edge などの Chromium 系, Firefox 142+ |
 | スタイル | 素の CSS + CSS Modules（UI ライブラリなし） |
 | Lint | ESLint 9（flat config） |
 | テスト | Vitest |
