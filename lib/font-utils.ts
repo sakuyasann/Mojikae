@@ -123,7 +123,19 @@ export function fallbackGenericFamily(category: string): string {
   return 'sans-serif';
 }
 
-/** 適用時に使う font-family 値（Google Font + 総称フォールバック）を組み立てる。 */
-export function buildAppliedFontFamilyValue(family: string, category: string): string {
-  return `${quoteFontFamily(family)}, ${fallbackGenericFamily(category)}`;
+/**
+ * 適用時に使う font-family 値を組み立てる。
+ *
+ * 複数フォントは指定順にそのまま並べる。ブラウザは字形を持たないフォントを
+ * 1 文字単位で読み飛ばすため、`"Inter", "Noto Sans JP", sans-serif` のように
+ * 並べれば「英字は Inter・日本語は Noto Sans JP」という使い分けになる。
+ * 総称フォールバックは先頭フォントのカテゴリから決める。
+ */
+export function buildAppliedFontFamilyValue(
+  fonts: readonly { family: string; category: string }[],
+): string {
+  const first = fonts[0];
+  if (first === undefined) return '';
+  const stack = fonts.map((font) => quoteFontFamily(font.family));
+  return [...stack, fallbackGenericFamily(first.category)].join(', ');
 }

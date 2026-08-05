@@ -6,6 +6,8 @@ SaaS・管理画面・Web サイトのフォント選定を主な用途として
 
 - ページ全体のフォントを Google Font へ変更する
 - ページ内で使われている特定の `font-family` だけを選んで変更する
+- **複数フォントを組み合わせて適用する**（英数字と日本語で別のフォントを使い分けられる）
+- **検索結果のフォント名を、そのフォント自身で描画して選ぶ**
 
 変更は**現在のタブにだけ**適用され、**ページをリロードするとすべて元に戻ります**。
 
@@ -253,9 +255,13 @@ push / pull request で 型チェック・Lint・テスト・両ブラウザの�
 
 - **現在アクティブなタブ以外へアクセスしません。** `tabs` 権限を持たず、`activeTab` で得た 1 タブだけを操作します。
 - **iframe の中身は変更しません。** 注入対象はトップフレームのみです。
-- **Google Fonts への通信が発生します。** フォントを適用したときに `fonts.googleapis.com` から CSS を取得し、
-  そこから参照される `fonts.gstatic.com` のフォントファイルをページが読み込みます。
-  この通信は選択されたフォント名を含みます。
+- **Google Fonts への通信が発生します。** 通信するのは次の 2 つの場面で、いずれも送るのはフォント名だけです。
+  - **フォントを検索したとき**: 検索結果の名前をそのフォントで描画するため、表示中のフォントの
+    サブセット（描画に必要な文字だけ）を取得します。
+  - **フォントを適用したとき**: `fonts.googleapis.com` から `@font-face` 定義を取得し、
+    そこから参照される `fonts.gstatic.com` のフォントファイルをページが読み込みます。
+
+  閲覧中のサイトの URL やページ内容が Google へ送られることはありません。
 - **保存するのは「最近使用したフォント名」だけです。** サイトの URL・タイトル・タブ情報・適用対象・適用状態は
   一切保存しません。閲覧情報の収集・送信は行いません。
 - 適用状態はページ内の data 属性にのみ保持しているため、**リロードすれば必ず消えます**。
@@ -295,6 +301,32 @@ Google Fonts のカタログ自体にも Material Icons / Material Symbols 系�
 `.icon` / `[class^="icon-"]` / `[class*=" icon-"]` のように語境界を見ることで、
 `pricing-icons-row` のような普通の要素まで除外しないようにしています。
 
+### 複数フォントの組み合わせ
+
+選択したフォントは選んだ順に `font-family` へ並びます。
+
+```css
+font-family: "Playfair Display", "Noto Sans JP", serif !important;
+```
+
+ブラウザは字形を持たないフォントを 1 文字単位で読み飛ばすため、
+**英数字は 1 番目のフォント、日本語は 2 番目のフォント**という使い分けになります
+（`Playfair Display` は日本語字形を持たないので、日本語だけ `Noto Sans JP` が使われる）。
+
+ポップアップでは `↑` `↓` で優先順位を入れ替えられます。総称フォールバック（`serif` / `sans-serif` など）は
+先頭フォントのカテゴリから決めています。
+
+Google Fonts CSS API へのリクエストは `family=` を並べて 1 回にまとめます。
+
+### フォント名のプレビュー
+
+検索結果とフォント一覧では、フォント名をそのフォント自身で描画します。
+一覧に出るフォントを完全な形で読むと重いため、CSS API v2 の `text=` パラメータで
+**実際に描画する文字だけ**に絞ったサブセットを 1 リクエストで取得しています（数十フォントでも数 KB）。
+
+ポップアップは拡張機能ページなので、MV3 の既定 CSP（`script-src` / `object-src` のみ制限）の下で
+外部スタイルシートとフォントを読み込めます。
+
 ### フォントの適用と解除
 
 1. ポップアップ側で Google Fonts CSS API v2 から CSS を `fetch`
@@ -315,7 +347,7 @@ Google Fonts のカタログ自体にも Material Icons / Material Symbols 系�
 ```text
 data-mojikae-active    有効化フラグ（<html>）
 data-mojikae-mode      page / groups（<html>）
-data-mojikae-font      適用中の Google Font 名（<html>）
+data-mojikae-font      適用中の Google Font 名（<html>・複数はカンマ区切り）
 data-mojikae-groups    選択中のグループ ID（<html>）
 data-mojikae-group     個別適用の対象要素
 data-mojikae-family    上書き前の font-family（個別適用の対象要素）
@@ -350,6 +382,17 @@ data-mojikae-family    上書き前の font-family（個別適用の対象要素
 - 走査は 10,000 要素で打ち切ります（打ち切った場合はポップアップに表示します）。
 - 斜体（italic）は読み込みません。MVP では通常体のみを対象にしています。
 - ダークテーマ・サイトごとの設定保存・Google アカウント連携には対応しません。
+
+## UI のライブプレビュー
+
+ポップアップ UI を拡張機能の外で動かして、HMR で確認しながら編集できます。
+`.preview/`（`.gitignore` 済み）に dev サーバの設定を置く方式です。
+
+```bash
+pnpm exec vite --config .preview/vite.config.ts
+```
+
+`wxt/browser` をスタブへ差し替え、タブ操作だけをダミーにして、カタログ JSON と storage は実体に近い挙動にします。
 
 ## 今後追加できること
 

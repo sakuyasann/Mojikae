@@ -5,7 +5,7 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['.output/**', '.wxt/**', 'node_modules/**', 'data/**', 'stats.html'],
+    ignores: ['.output/**', '.wxt/**', 'node_modules/**', 'data/**', 'stats.html', '.preview/**'],
   },
 
   js.configs.recommended,

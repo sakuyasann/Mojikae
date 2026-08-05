@@ -14,8 +14,8 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 10px;
-  min-height: 30px;
+  padding: 6px 10px 6px 6px;
+  min-height: 34px;
   cursor: pointer;
   border-bottom: 1px solid var(--fp-border);
 }
@@ -33,17 +33,23 @@
   box-shadow: inset 3px 0 0 var(--fp-border-active);
 }
 
+/* フォント名はそのフォント自身で描画するので、少し大きめに出す */
 .name {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 15px;
+  line-height: 1.35;
 }
 
+/* チェック位置を左端に固定して、選択状態を行頭で分かるようにする */
 .check {
   flex: none;
+  width: 14px;
   font-size: 11px;
+  text-align: center;
   color: var(--fp-text);
 }
 

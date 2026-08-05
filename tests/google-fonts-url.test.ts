@@ -88,12 +88,20 @@ describe('buildGoogleFontsCssUrl', () => {
       family: 'IBM Plex Sans JP',
       variants: ['regular', '500', '600', '700'],
     };
-    expect(buildGoogleFontsCssUrl(font)).toBe(
+    expect(buildGoogleFontsCssUrl([font])).toBe(
       'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP:wght@400;500;600;700&display=swap',
     );
   });
 
   it('API キーを含まない', () => {
-    expect(buildGoogleFontsCssUrl(base)).not.toContain('key=');
+    expect(buildGoogleFontsCssUrl([base])).not.toContain('key=');
+  });
+
+  it('複数フォントを 1 リクエストへまとめ、family を昇順に並べる', () => {
+    const inter: GoogleFont = { ...base, family: 'Inter', variants: ['regular', '700'] };
+    const noto: GoogleFont = { ...base, family: 'Noto Sans JP', variants: ['regular'] };
+    expect(buildGoogleFontsCssUrl([noto, inter])).toBe(
+      'https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+JP&display=swap',
+    );
   });
 });

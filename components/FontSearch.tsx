@@ -1,23 +1,26 @@
 import { useId, useMemo, useState, type KeyboardEvent } from 'react';
 import { SEARCH_RESULT_LIMIT } from '../lib/constants';
-import { isIconFont, isJapaneseFont, searchFonts } from '../lib/google-fonts';
+import { searchFonts } from '../lib/google-fonts';
 import type { GoogleFont } from '../types/google-font';
 import { FontSearchResult } from './FontSearchResult';
 import styles from './FontSearch.module.css';
 
 type FontSearchProps = {
   fonts: GoogleFont[];
-  selectedFont: GoogleFont | null;
+  /** 選択済みフォントのファミリー名。 */
+  selectedFamilies: ReadonlySet<string>;
   disabled: boolean;
-  onSelect: (font: GoogleFont) => void;
+  /** 選択・解除のトグル。複数選択できる。 */
+  onToggle: (font: GoogleFont) => void;
 };
 
 /**
  * Google Fonts の検索欄。
- * 上下キーで候補を移動、Enter で決定、Escape で候補を閉じる。
+ * 上下キーで候補を移動、Enter で選択/解除、Escape で候補を閉じる。
+ * 複数選択でき、選んだ順に font-family へ並ぶ。
  * ここで選ぶだけではページへ適用せず、適用対象を決めて「適用」を押すまで何も起きない。
  */
-export function FontSearch({ fonts, selectedFont, disabled, onSelect }: FontSearchProps) {
+export function FontSearch({ fonts, selectedFamilies, disabled, onToggle }: FontSearchProps) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [rawActiveIndex, setActiveIndex] = useState(0);
@@ -42,9 +45,9 @@ export function FontSearch({ fonts, selectedFont, disabled, onSelect }: FontSear
   // 候補が減って activeIndex がはみ出しても壊れないようにする
   const activeIndex = items.length === 0 ? 0 : Math.min(rawActiveIndex, items.length - 1);
 
-  const select = (font: GoogleFont) => {
-    onSelect(font);
-    setOpen(false);
+  // 複数選ぶことが多いので、選択してもリストは閉じない
+  const toggle = (font: GoogleFont) => {
+    onToggle(font);
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -67,7 +70,7 @@ export function FontSearch({ fonts, selectedFont, disabled, onSelect }: FontSear
       const item = items[activeIndex];
       if (item) {
         event.preventDefault();
-        select(item.font);
+        toggle(item.font);
       }
       return;
     }
@@ -128,28 +131,15 @@ export function FontSearch({ fonts, selectedFont, disabled, onSelect }: FontSear
             listId={listId}
             items={items}
             activeIndex={activeIndex}
-            selectedFamily={selectedFont?.family ?? null}
+            selectedFamilies={selectedFamilies}
             totalCount={matchedCount}
-            onSelect={select}
+            onToggle={toggle}
             onActiveIndexChange={setActiveIndex}
           />
         )}
       </div>
 
-      <div className={`${styles.selected} ${selectedFont ? '' : styles.selectedEmpty}`}>
-        <span className={styles.selectedLabel}>選択中</span>
-        <span className={styles.selectedName}>{selectedFont?.family ?? 'フォント未選択'}</span>
-        {selectedFont && isJapaneseFont(selectedFont) && (
-          <span className={styles.selectedLabel}>日本語</span>
-        )}
-      </div>
-      {selectedFont && isIconFont(selectedFont) && (
-        <p className={styles.warning} role="status">
-          <span aria-hidden="true">! </span>
-          これはアイコンフォントです。本文へ適用すると文字が記号に置き換わります。
-        </p>
-      )}
-      <p className={styles.hint}>選択しただけでは適用されません。対象を選んで「適用」を押してください。</p>
+      <p className={styles.hint}>クリック（または Enter）で選択・解除。複数選べます。</p>
     </div>
   );
 }

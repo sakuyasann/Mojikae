@@ -3,8 +3,10 @@ import styles from './RecentFonts.module.css';
 type RecentFontsProps = {
   /** 最近使用したフォント名（新しい順・重複なし・最大 5 件）。 */
   families: string[];
-  selectedFamily: string | null;
+  /** 選択済みフォントのファミリー名。 */
+  selectedFamilies: ReadonlySet<string>;
   disabled: boolean;
+  /** クリックで選択・解除を切り替える。 */
   onSelect: (family: string) => void;
 };
 
@@ -12,7 +14,7 @@ type RecentFontsProps = {
  * 最近使用した Google Fonts。
  * 保存しているのはフォント名だけで、サイト・タブ・適用対象・適用状態は保存しない。
  */
-export function RecentFonts({ families, selectedFamily, disabled, onSelect }: RecentFontsProps) {
+export function RecentFonts({ families, selectedFamilies, disabled, onSelect }: RecentFontsProps) {
   return (
     <section className={styles.wrapper} aria-labelledby="recent-fonts-label">
       <h2 className={styles.label} id="recent-fonts-label">
@@ -23,7 +25,7 @@ export function RecentFonts({ families, selectedFamily, disabled, onSelect }: Re
       ) : (
         <ul className={styles.list}>
           {families.map((family) => {
-            const isSelected = family === selectedFamily;
+            const isSelected = selectedFamilies.has(family);
             return (
               <li key={family}>
                 <button

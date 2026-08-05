@@ -82,11 +82,39 @@ describe('fontFamilyGroupId', () => {
 
 describe('buildAppliedFontFamilyValue', () => {
   it('カテゴリに応じた総称ファミリーを付ける', () => {
-    expect(buildAppliedFontFamilyValue('IBM Plex Sans JP', 'sans-serif')).toBe(
+    expect(buildAppliedFontFamilyValue([{ family: 'IBM Plex Sans JP', category: 'sans-serif' }])).toBe(
       '"IBM Plex Sans JP", sans-serif',
     );
-    expect(buildAppliedFontFamilyValue('Noto Serif JP', 'serif')).toBe('"Noto Serif JP", serif');
-    expect(buildAppliedFontFamilyValue('Roboto Mono', 'monospace')).toBe('"Roboto Mono", monospace');
-    expect(buildAppliedFontFamilyValue('Caveat', 'handwriting')).toBe('Caveat, cursive');
+    expect(buildAppliedFontFamilyValue([{ family: 'Noto Serif JP', category: 'serif' }])).toBe(
+      '"Noto Serif JP", serif',
+    );
+    expect(buildAppliedFontFamilyValue([{ family: 'Roboto Mono', category: 'monospace' }])).toBe(
+      '"Roboto Mono", monospace',
+    );
+    expect(buildAppliedFontFamilyValue([{ family: 'Caveat', category: 'handwriting' }])).toBe(
+      'Caveat, cursive',
+    );
+  });
+
+  it('複数フォントを指定順に並べる（英字→日本語の使い分け）', () => {
+    expect(
+      buildAppliedFontFamilyValue([
+        { family: 'Inter', category: 'sans-serif' },
+        { family: 'Noto Sans JP', category: 'sans-serif' },
+      ]),
+    ).toBe('Inter, "Noto Sans JP", sans-serif');
+  });
+
+  it('総称ファミリーは先頭フォントのカテゴリから決める', () => {
+    expect(
+      buildAppliedFontFamilyValue([
+        { family: 'Playfair Display', category: 'serif' },
+        { family: 'Noto Sans JP', category: 'sans-serif' },
+      ]),
+    ).toBe('"Playfair Display", "Noto Sans JP", serif');
+  });
+
+  it('空配列なら空文字を返す', () => {
+    expect(buildAppliedFontFamilyValue([])).toBe('');
   });
 });

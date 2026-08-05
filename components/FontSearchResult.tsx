@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { loadPreviewFonts, previewFontFamily } from '../lib/font-preview';
 import type { FontSearchItem, GoogleFont, GoogleFontCategory } from '../types/google-font';
 import styles from './FontSearchResult.module.css';
 
@@ -14,10 +15,11 @@ type FontSearchResultProps = {
   listId: string;
   items: FontSearchItem[];
   activeIndex: number;
-  selectedFamily: string | null;
+  /** 選択済みフォントのファミリー名。複数選択できる。 */
+  selectedFamilies: ReadonlySet<string>;
   /** 絞り込み結果の総数（表示件数で切り詰める前）。 */
   totalCount: number;
-  onSelect: (font: GoogleFont) => void;
+  onToggle: (font: GoogleFont) => void;
   onActiveIndexChange: (index: number) => void;
 };
 
@@ -25,12 +27,17 @@ export function FontSearchResult({
   listId,
   items,
   activeIndex,
-  selectedFamily,
+  selectedFamilies,
   totalCount,
-  onSelect,
+  onToggle,
   onActiveIndexChange,
 }: FontSearchResultProps) {
   const listRef = useRef<HTMLUListElement>(null);
+
+  // 表示中のフォントを実際に読み込んで、名前をそのフォントで描画できるようにする
+  useEffect(() => {
+    loadPreviewFonts(items.map((item) => item.font.family));
+  }, [items]);
 
   // キーボードで移動したときに選択中の行を見える位置へ送る
   useEffect(() => {
@@ -49,9 +56,9 @@ export function FontSearchResult({
   }
 
   return (
-    <ul className={styles.list} id={listId} role="listbox" ref={listRef} aria-label="Google Fonts 検索結果">
+    <ul className={styles.list} id={listId} role="listbox" aria-multiselectable ref={listRef} aria-label="Google Fonts 検索結果">
       {items.map((item, index) => {
-        const isSelected = item.font.family === selectedFamily;
+        const isSelected = selectedFamilies.has(item.font.family);
         const classNames = [
           styles.option,
           index === activeIndex ? styles.optionActive : '',
@@ -73,16 +80,22 @@ export function FontSearchResult({
             // mousedown で選択する。input の blur より先に走らせるため。
             onMouseDown={(event) => {
               event.preventDefault();
-              onSelect(item.font);
+              onToggle(item.font);
             }}
           >
-            <span className={styles.name}>{item.font.family}</span>
-            {item.isIconFont && <span className={`${styles.badge} ${styles.badgeIcon}`}>アイコン</span>}
-            {item.isJapanese && <span className={`${styles.badge} ${styles.badgeJapanese}`}>日本語</span>}
-            <span className={styles.badge}>{CATEGORY_LABELS[item.font.category]}</span>
             <span className={styles.check} aria-hidden="true">
               {isSelected ? '✓' : ''}
             </span>
+            {/* フォント名をそのフォント自身で描画する */}
+            <span
+              className={styles.name}
+              style={{ fontFamily: previewFontFamily(item.font.family, item.font.category) }}
+            >
+              {item.font.family}
+            </span>
+            {item.isIconFont && <span className={`${styles.badge} ${styles.badgeIcon}`}>アイコン</span>}
+            {item.isJapanese && <span className={`${styles.badge} ${styles.badgeJapanese}`}>日本語</span>}
+            <span className={styles.badge}>{CATEGORY_LABELS[item.font.category]}</span>
           </li>
         );
       })}

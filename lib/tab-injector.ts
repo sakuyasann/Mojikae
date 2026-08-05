@@ -5,7 +5,7 @@ import { buildAppliedFontFamilyValue } from './font-utils';
 import { buildGoogleFontsCssUrl } from './google-fonts-url';
 import { EXCLUDED_SELECTORS, TARGET_SELECTORS } from './icon-font-detector';
 import type { GoogleFont } from '../types/google-font';
-import type { ApplyMode } from '../types/tab-state';
+import { FONT_NAME_SEPARATOR, type ApplyMode } from '../types/tab-state';
 
 /**
  * 現在のタブへ Google Font を適用 / 解除する。
@@ -59,7 +59,7 @@ type PrepareArgs = {
   attrs: typeof PAGE_ATTRS;
   bridgeKey: string;
   mode: ApplyMode;
-  fontName: string;
+  fontNames: string;
   /** `raw computed font-family` → グループ ID の対応表。 */
   rawToGroup: [string, string][];
   groupIds: string[];
@@ -148,7 +148,7 @@ export function preparePage(args: PrepareArgs): PrepareResult {
   }
 
   root.setAttribute(args.attrs.mode, args.mode);
-  root.setAttribute(args.attrs.font, args.fontName);
+  root.setAttribute(args.attrs.font, args.fontNames);
   root.setAttribute(args.attrs.groups, args.groupIds.join(','));
 
   return { matched, previousCss };
@@ -202,9 +202,12 @@ export function releasePage(args: ReleaseArgs): string[] {
   return css;
 }
 
-/** Google Fonts CSS API から @font-face 定義を取得する。ページ側ではなく拡張機能側で fetch する。 */
-async function fetchGoogleFontCss(font: GoogleFont): Promise<string> {
-  const url = buildGoogleFontsCssUrl(font);
+/**
+ * Google Fonts CSS API から @font-face 定義を取得する。ページ側ではなく拡張機能側で fetch する。
+ * 複数フォントは 1 リクエストにまとめる。
+ */
+async function fetchGoogleFontCss(fonts: readonly GoogleFont[]): Promise<string> {
+  const url = buildGoogleFontsCssUrl(fonts);
   let response: Response;
   try {
     response = await fetch(url);
@@ -242,13 +245,20 @@ async function removeCssQuietly(tabId: number, cssList: string[]): Promise<void>
  * 現在のタブへフォントを適用する。
  * 対象は常にアクティブタブのトップフレームのみ（iframe へは適用しない）。
  */
-export async function applyFont(tabId: number, font: GoogleFont, target: ApplyTarget): Promise<void> {
+export async function applyFont(
+  tabId: number,
+  fonts: readonly GoogleFont[],
+  target: ApplyTarget,
+): Promise<void> {
+  if (fonts.length === 0) {
+    throw new ExtensionError('FONT_NOT_FOUND', { detail: 'フォントが選択されていません' });
+  }
   if (target.mode === 'groups' && target.groups.length === 0) {
     throw new ExtensionError('NO_TARGET_SELECTED');
   }
 
   // 先にフォント CSS を取得する。ここで失敗したらページには一切触れない。
-  const fontCss = await fetchGoogleFontCss(font);
+  const fontCss = await fetchGoogleFontCss(fonts);
 
   const groupIds = target.mode === 'groups' ? target.groups.map((group) => group.id) : [];
   const rawToGroup: [string, string][] =
@@ -266,7 +276,7 @@ export async function applyFont(tabId: number, font: GoogleFont, target: ApplyTa
           attrs: PAGE_ATTRS,
           bridgeKey: PAGE_BRIDGE_KEY,
           mode: target.mode,
-          fontName: font.family,
+          fontNames: fonts.map((font) => font.family).join(FONT_NAME_SEPARATOR),
           rawToGroup,
           groupIds,
           maxElements: MAX_SCAN_ELEMENTS,
@@ -288,7 +298,7 @@ export async function applyFont(tabId: number, font: GoogleFont, target: ApplyTa
     throw new ExtensionError('FONT_NOT_FOUND');
   }
 
-  const fontValue = buildAppliedFontFamilyValue(font.family, font.category);
+  const fontValue = buildAppliedFontFamilyValue(fonts);
   const overrideCss =
     target.mode === 'page' ? buildPageOverrideCss(fontValue) : buildGroupOverrideCss(fontValue, groupIds);
 

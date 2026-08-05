@@ -72,7 +72,15 @@ export function buildFamilyQueryValue(font: GoogleFont): string {
   return `${encoded}:wght@${weights.join(';')}`;
 }
 
-/** 選択されたフォントを読み込むための Google Fonts CSS API v2 の URL。 */
-export function buildGoogleFontsCssUrl(font: GoogleFont): string {
-  return `${CSS_API_ENDPOINT}?family=${buildFamilyQueryValue(font)}&display=swap`;
+/**
+ * 選択されたフォントを読み込むための Google Fonts CSS API v2 の URL。
+ * 複数フォントは `family=` を並べて 1 リクエストにまとめる。
+ * CSS API は family を昇順で並べることを要求するため、ここで整列する。
+ */
+export function buildGoogleFontsCssUrl(fonts: readonly GoogleFont[]): string {
+  const families = [...fonts]
+    .sort((a, b) => a.family.localeCompare(b.family, 'en'))
+    .map((font) => `family=${buildFamilyQueryValue(font)}`)
+    .join('&');
+  return `${CSS_API_ENDPOINT}?${families}&display=swap`;
 }

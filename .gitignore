@@ -7,3 +7,6 @@ stats.html
 
 # web-ext のローカル設定（起動する Firefox の指定など。環境依存）
 web-ext.config.ts
+
+# UI ライブプレビュー用（ローカル専用）
+.preview

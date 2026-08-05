@@ -5,6 +5,7 @@ import { ErrorMessage } from '../../components/ErrorMessage';
 import { FontSearch } from '../../components/FontSearch';
 import { Header } from '../../components/Header';
 import { RecentFonts } from '../../components/RecentFonts';
+import { SelectedFonts } from '../../components/SelectedFonts';
 import { getActiveTab } from '../../lib/active-tab';
 import { ERROR_MESSAGES, formatErrorMessage, toExtensionError } from '../../lib/extension-errors';
 import { findFontByFamily, loadCatalog, loadRecentFonts, pushRecentFont } from '../../lib/google-fonts';
@@ -26,7 +27,8 @@ export default function App() {
 
   const [catalog, setCatalog] = useState<GoogleFont[]>([]);
   const [recent, setRecent] = useState<string[]>([]);
-  const [selectedFont, setSelectedFont] = useState<GoogleFont | null>(null);
+  /** 適用するフォント。配列の順序がそのまま font-family の指定順になる。 */
+  const [selectedFonts, setSelectedFonts] = useState<GoogleFont[]>([]);
 
   const [scan, setScan] = useState<TabScanResult | null>(null);
   const [wholePage, setWholePage] = useState(true);
@@ -97,10 +99,10 @@ export default function App() {
           setApplied(true);
           setWholePage(state.mode === 'page');
           setSelectedGroupIds(new Set(state.groupIds));
-          if (state.fontFamily !== null) {
-            const restored = findFontByFamily(fonts, state.fontFamily);
-            if (restored) setSelectedFont(restored);
-          }
+          const restored = state.fontFamilies
+            .map((family) => findFontByFamily(fonts, family))
+            .filter((font): font is GoogleFont => font !== undefined);
+          if (restored.length > 0) setSelectedFonts(restored);
         }
       } catch (caught) {
         setFatalError(formatErrorMessage(toExtensionError(caught, 'UNSUPPORTED_PAGE')));
@@ -115,9 +117,32 @@ export default function App() {
     void initialize();
   }, [runScan]);
 
-  const selectFont = useCallback((font: GoogleFont) => {
-    setSelectedFont(font);
+  /** 検索結果のクリックで選択・解除を切り替える。追加は末尾（優先度は低い側）へ。 */
+  const toggleFont = useCallback((font: GoogleFont) => {
     setError(null);
+    setSelectedFonts((current) =>
+      current.some((entry) => entry.family === font.family)
+        ? current.filter((entry) => entry.family !== font.family)
+        : [...current, font],
+    );
+  }, []);
+
+  const removeFont = useCallback((family: string) => {
+    setSelectedFonts((current) => current.filter((entry) => entry.family !== family));
+  }, []);
+
+  /** 優先順位の入れ替え。先頭ほど優先される。 */
+  const moveFont = useCallback((family: string, direction: -1 | 1) => {
+    setSelectedFonts((current) => {
+      const index = current.findIndex((entry) => entry.family === family);
+      const next = index + direction;
+      if (index < 0 || next < 0 || next >= current.length) return current;
+      const updated = [...current];
+      const [moved] = updated.splice(index, 1);
+      if (moved === undefined) return current;
+      updated.splice(next, 0, moved);
+      return updated;
+    });
   }, []);
 
   const selectRecentFont = useCallback(
@@ -127,9 +152,9 @@ export default function App() {
         setError(ERROR_MESSAGES.FONT_NOT_FOUND);
         return;
       }
-      selectFont(font);
+      toggleFont(font);
     },
-    [catalog, selectFont],
+    [catalog, toggleFont],
   );
 
   const handleWholePageChange = useCallback(
@@ -164,7 +189,7 @@ export default function App() {
   const applyNow = useCallback(async () => {
     if (busyRef.current) return;
     const tabId = tabIdRef.current;
-    if (tabId === null || !selectedFont) return;
+    if (tabId === null || selectedFonts.length === 0) return;
 
     const target: ApplyTarget = wholePage
       ? { mode: 'page' }
@@ -184,9 +209,14 @@ export default function App() {
     setBusy('apply');
     setError(null);
     try {
-      await applyFont(tabId, selectedFont, target);
+      await applyFont(tabId, selectedFonts, target);
       setApplied(true);
-      setRecent(await pushRecentFont(selectedFont.family));
+      // 最近使用したフォントは、優先度の高い順に記録する
+      let latest = recent;
+      for (const font of [...selectedFonts].reverse()) {
+        latest = await pushRecentFont(font.family);
+      }
+      setRecent(latest);
     } catch (caught) {
       setApplied(false);
       setError(formatErrorMessage(toExtensionError(caught, 'APPLY_FAILED')));
@@ -194,7 +224,7 @@ export default function App() {
       busyRef.current = false;
       setBusy(null);
     }
-  }, [groups, selectedFont, selectedGroupIds, wholePage]);
+  }, [groups, recent, selectedFonts, selectedGroupIds, wholePage]);
 
   const releaseNow = useCallback(async () => {
     if (busyRef.current) return;
@@ -223,7 +253,12 @@ export default function App() {
 
   const hasTarget = wholePage || selectedGroupIds.size > 0;
   const canApply =
-    ready && fatalError === null && busy === null && selectedFont !== null && hasTarget && catalog.length > 0;
+    ready && fatalError === null && busy === null && selectedFonts.length > 0 && hasTarget && catalog.length > 0;
+
+  const selectedFamilies = useMemo(
+    () => new Set(selectedFonts.map((font) => font.family)),
+    [selectedFonts],
+  );
 
   if (fatalError !== null) {
     return (
@@ -262,13 +297,19 @@ export default function App() {
           <div className={styles.scroll}>
             <FontSearch
               fonts={catalog}
-              selectedFont={selectedFont}
+              selectedFamilies={selectedFamilies}
               disabled={busy !== null || catalog.length === 0}
-              onSelect={selectFont}
+              onToggle={toggleFont}
+            />
+            <SelectedFonts
+              fonts={selectedFonts}
+              disabled={busy !== null}
+              onRemove={removeFont}
+              onMove={moveFont}
             />
             <RecentFonts
               families={recent}
-              selectedFamily={selectedFont?.family ?? null}
+              selectedFamilies={selectedFamilies}
               disabled={busy !== null || catalog.length === 0}
               onSelect={selectRecentFont}
             />

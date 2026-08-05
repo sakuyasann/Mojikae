@@ -1,0 +1,137 @@
+.wrapper {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--fp-border);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fp-text-muted);
+}
+
+.count {
+  font-size: 11px;
+  color: var(--fp-text-faint);
+}
+
+.empty {
+  padding: 7px 8px;
+  border: 1px solid var(--fp-border);
+  border-left: 3px solid var(--fp-border);
+  border-radius: var(--fp-radius);
+  background: var(--fp-bg-subtle);
+  color: var(--fp-text-muted);
+  font-size: 12px;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--fp-border-strong);
+  border-radius: var(--fp-radius);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 6px 5px 8px;
+  min-height: 34px;
+  border-bottom: 1px solid var(--fp-border);
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+/* 先頭が最優先。順位を数字でも示す */
+.order {
+  flex: none;
+  width: 16px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--fp-text-faint);
+  text-align: center;
+}
+
+.body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.meta {
+  display: block;
+  font-size: 10px;
+  color: var(--fp-text-faint);
+}
+
+.controls {
+  display: flex;
+  gap: 2px;
+  flex: none;
+}
+
+.iconButton {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: var(--fp-bg);
+  border: 1px solid var(--fp-border-strong);
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 10px;
+  line-height: 1;
+  color: var(--fp-text);
+}
+
+.iconButton:not(:disabled):hover {
+  border-color: var(--fp-border-active);
+}
+
+.iconButton:disabled {
+  cursor: not-allowed;
+  color: var(--fp-text-faint);
+  background: var(--fp-bg-subtle);
+  border-color: var(--fp-border);
+}
+
+.remove {
+  font-size: 12px;
+}
+
+.hint {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: var(--fp-text-faint);
+}
+
+.stack {
+  margin: 5px 0 0;
+  padding: 5px 7px;
+  border: 1px solid var(--fp-border);
+  border-radius: var(--fp-radius);
+  background: var(--fp-bg-subtle);
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--fp-text-muted);
+  word-break: break-all;
+}
