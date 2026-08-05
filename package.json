@@ -36,6 +36,7 @@
     "typescript": "^5.9.0",
     "typescript-eslint": "^8.46.0",
     "vitest": "^3.2.0",
+    "web-ext": "^10.6.0",
     "wxt": "^0.21.0"
   },
   "packageManager": "pnpm@10.24.0",
@@ -43,6 +44,8 @@
     "overrides": {
       "@vitejs/plugin-react": "^5.2.0"
     },
-    "onlyBuiltDependencies": ["esbuild"]
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

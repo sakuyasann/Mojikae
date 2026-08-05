@@ -56,11 +56,73 @@ Edge の場合は `edge://extensions` で同じ手順です。
 pnpm dev:firefox
 ```
 
-手動で読み込む場合は次のとおりです。
+Firefox が専用プロファイルで起動し、拡張機能が読み込まれた状態になります。ソースを編集すると自動で再読み込みされます。
 
-1. `pnpm build:firefox` を実行する
-2. `about:debugging#/runtime/this-firefox` を開く
-3. 「一時的なアドオンを読み込む」で `.output/firefox-mv3/manifest.json` を選ぶ
+> 通常版 Firefox ではなく Developer Edition / Nightly を使いたい場合は、リポジトリ直下に
+> `web-ext.config.ts` を置いて起動するバイナリを指定します（環境依存なので `.gitignore` 済み）。
+>
+> ```ts
+> import { defineWebExtConfig } from 'wxt';
+> export default defineWebExtConfig({ binaries: { firefox: 'deved' } });
+> ```
+>
+> 指定できるのは `firefox` / `beta` / `nightly` / `deved`、または実行ファイルの絶対パスです。
+
+## Firefox へのインストール
+
+Firefox は署名のないアドオンの扱いが Chromium より厳しく、目的によって手順が変わります。
+
+### 方法 1: 一時的に入れて試す（どの Firefox でも可）
+
+```bash
+pnpm build:firefox
+```
+
+1. `about:debugging#/runtime/this-firefox` を開く
+2. 「一時的なアドオンを読み込む」を押す
+3. `.output/firefox-mv3/manifest.json` を選ぶ
+
+いま使っているプロファイルにそのまま入るので、普段のブックマークやログイン状態のまま試せます。
+**Firefox を再起動すると消えます。**
+
+### 方法 2: 署名なしで恒久インストール（Developer Edition / Nightly / ESR のみ）
+
+```bash
+pnpm zip:firefox
+cp .output/mojikae-<version>-firefox.zip .output/mojikae-<version>-firefox.xpi
+```
+
+1. `about:config` を開き、`xpinstall.signatures.required` を `false` にする
+2. `about:addons` → 歯車アイコン → 「ファイルからアドオンをインストール」
+3. 上で作った `.xpi` を選ぶ
+
+再起動しても残ります。**通常版（Release）Firefox ではこの設定が効かない**ため、この方法は使えません。
+
+### 方法 3: AMO で署名して通常版 Firefox に入れる
+
+[addons.mozilla.org](https://addons.mozilla.org/developers/addon/api/key/) で API 資格情報を発行し、
+ストアには公開せず（unlisted）署名だけを受けます。
+
+```bash
+pnpm exec web-ext sign \
+  --source-dir .output/firefox-mv3 \
+  --artifacts-dir .output \
+  --channel unlisted \
+  --api-key "$AMO_JWT_ISSUER" \
+  --api-secret "$AMO_JWT_SECRET"
+```
+
+署名済み `.xpi` が `.output` に出力され、通常版 Firefox へ恒久インストールできます。
+`browser_specific_settings.gecko.id`（`mojikae@sakuyasan.net`）が署名の識別子になるため、変更しないでください。
+
+### パッケージの検証
+
+```bash
+pnpm exec web-ext lint --source-dir .output/firefox-mv3 --no-config-discovery
+```
+
+`errors: 0` であれば AMO の自動検査は通ります。React の内部実装が `innerHTML` を使っているため
+`UNSAFE_VAR_ASSIGNMENT` の警告が 2 件出ますが、これは React を使う拡張機能では共通で、審査上の問題にはなりません。
 
 ## ビルド
 
@@ -266,7 +328,8 @@ data-mojikae-family    上書き前の font-family（個別適用の対象要素
 | マニフェスト | MV3 | MV3（WXT の既定は MV2 なので `manifestVersion: 3` を明示） |
 | 拡張機能 ID | 不要 | `browser_specific_settings.gecko.id` が必須 |
 | データ収集の申告 | 不要 | `data_collection_permissions` が必須（本拡張は `none`） |
-| 最低バージョン | – | Firefox 128 以上 |
+| 最低バージョン | – | Firefox 142 以上（`data_collection_permissions` の導入バージョン） |
+| 署名なしの恒久インストール | 可（デベロッパーモード） | Developer Edition / Nightly / ESR のみ |
 | ソース zip | 不要 | 審査で必要（`pnpm zip:firefox` が生成） |
 | API 名 | `chrome.*` / `browser.*` | `browser.*` |
 

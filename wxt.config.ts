@@ -40,7 +40,9 @@ export default defineConfig({
           browser_specific_settings: {
             gecko: {
               id: 'mojikae@sakuyasan.net',
-              strict_min_version: '128.0',
+              // data_collection_permissions は Firefox 142 で導入されたキー。
+              // これより古いバージョンを許すと web-ext lint が警告を出す。
+              strict_min_version: '142.0',
               // ユーザーデータの収集・送信は一切行わない
               data_collection_permissions: { required: ['none'] },
             },

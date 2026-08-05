@@ -4,3 +4,6 @@ node_modules
 stats.html
 *.zip
 .DS_Store
+
+# web-ext のローカル設定（起動する Firefox の指定など。環境依存）
+web-ext.config.ts
