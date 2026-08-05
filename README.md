@@ -224,6 +224,10 @@ push / pull request で 型チェック・Lint・テスト・両ブラウザの�
   RemixIcon / Bootstrap Icons / IcoMoon / Octicons などの既知のライブラリ名
 - Unicode Private Use Area の文字を含む要素の比率が 40% 以上
 
+Google Fonts のカタログ自体にも Material Icons / Material Symbols 系のアイコンフォントが含まれます。
+これらは検索結果に残しつつ「アイコン」ラベルを付け、選択した場合は本文向きでない旨を警告します
+（適用そのものは妨げません）。
+
 ページ全体適用時は、`code` / `pre` / `kbd` / `samp` / `svg` などと上記ライブラリのクラスを
 **その子孫も含めて**除外します。`[class*="icon"]` のような広すぎる指定は使わず、
 `.icon` / `[class^="icon-"]` / `[class*=" icon-"]` のように語境界を見ることで、

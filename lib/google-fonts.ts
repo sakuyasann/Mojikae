@@ -1,6 +1,7 @@
 import { browser } from 'wxt/browser';
 import { RECENT_FONTS_LIMIT, SEARCH_RESULT_LIMIT } from './constants';
 import { ExtensionError } from './extension-errors';
+import { isIconFontName } from './icon-font-detector';
 import { JAPANESE_SUBSET, type FontSearchItem, type GoogleFont, type GoogleFontsCatalog } from '../types/google-font';
 
 /**
@@ -44,8 +45,16 @@ export function isJapaneseFont(font: GoogleFont): boolean {
   return font.subsets.includes(JAPANESE_SUBSET);
 }
 
+/**
+ * カタログに含まれるアイコンフォント（Material Icons / Symbols 系）か。
+ * ページ内フォントの判定と同じ名前ヒューリスティックを使い回している。
+ */
+export function isIconFont(font: GoogleFont): boolean {
+  return isIconFontName(font.family);
+}
+
 function toSearchItem(font: GoogleFont): FontSearchItem {
-  return { font, isJapanese: isJapaneseFont(font) };
+  return { font, isJapanese: isJapaneseFont(font), isIconFont: isIconFont(font) };
 }
 
 /**

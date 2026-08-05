@@ -63,6 +63,13 @@
   color: var(--fp-text);
 }
 
+/* アイコンフォントの警告。色だけでなくラベル文言でも伝える */
+.badgeIcon {
+  border-color: var(--fp-warn-border);
+  background: var(--fp-warn-bg);
+  color: #93602a;
+}
+
 .empty {
   padding: 10px;
   color: var(--fp-text-muted);

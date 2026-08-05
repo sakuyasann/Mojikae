@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { mergeRecentFonts, searchFonts } from '../lib/google-fonts';
+import { isIconFont, mergeRecentFonts, searchFonts } from '../lib/google-fonts';
 import type { GoogleFont } from '../types/google-font';
 
 const font = (family: string, subsets: string[] = ['latin']): GoogleFont => ({
@@ -15,6 +15,8 @@ const CATALOG: GoogleFont[] = [
   font('Robot Crush'),
   font('IBM Plex Sans JP', ['japanese', 'latin']),
   font('Inter'),
+  // Google Fonts Developer API はアイコンフォントも返す
+  font('Material Symbols Rounded'),
 ];
 
 describe('searchFonts', () => {
@@ -46,6 +48,28 @@ describe('searchFonts', () => {
 
   it('空クエリでは全件を対象にする', () => {
     expect(searchFonts(CATALOG, '', 100)).toHaveLength(CATALOG.length);
+  });
+
+  it('アイコンフォントは検索結果に残しつつ isIconFont を立てる', () => {
+    const result = searchFonts(CATALOG, 'material');
+    expect(result).toHaveLength(1);
+    expect(result[0]?.font.family).toBe('Material Symbols Rounded');
+    expect(result[0]?.isIconFont).toBe(true);
+  });
+
+  it('通常のフォントには isIconFont を立てない', () => {
+    expect(searchFonts(CATALOG, 'Inter')[0]?.isIconFont).toBe(false);
+  });
+});
+
+describe('isIconFont', () => {
+  it('Material Icons / Symbols 系を判定する', () => {
+    expect(isIconFont(font('Material Icons'))).toBe(true);
+    expect(isIconFont(font('Material Symbols Outlined'))).toBe(true);
+  });
+
+  it('通常のフォントは false', () => {
+    expect(isIconFont(font('Noto Sans JP'))).toBe(false);
   });
 });
 

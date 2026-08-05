@@ -56,4 +56,9 @@ export type FontSearchItem = {
   font: GoogleFont;
   /** 日本語サブセットを持つか。UI の「日本語」ラベルと優先表示に使う。 */
   isJapanese: boolean;
+  /**
+   * Google Fonts が配信しているアイコンフォント（Material Icons / Symbols 系）か。
+   * 本文用フォントとして選ぶとページが記号だらけになるため、UI で警告する。
+   */
+  isIconFont: boolean;
 };

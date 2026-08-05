@@ -1,6 +1,6 @@
 import { useId, useMemo, useState, type KeyboardEvent } from 'react';
 import { SEARCH_RESULT_LIMIT } from '../lib/constants';
-import { isJapaneseFont, searchFonts } from '../lib/google-fonts';
+import { isIconFont, isJapaneseFont, searchFonts } from '../lib/google-fonts';
 import type { GoogleFont } from '../types/google-font';
 import { FontSearchResult } from './FontSearchResult';
 import styles from './FontSearch.module.css';
@@ -143,6 +143,12 @@ export function FontSearch({ fonts, selectedFont, disabled, onSelect }: FontSear
           <span className={styles.selectedLabel}>日本語</span>
         )}
       </div>
+      {selectedFont && isIconFont(selectedFont) && (
+        <p className={styles.warning} role="status">
+          <span aria-hidden="true">! </span>
+          これはアイコンフォントです。本文へ適用すると文字が記号に置き換わります。
+        </p>
+      )}
       <p className={styles.hint}>選択しただけでは適用されません。対象を選んで「適用」を押してください。</p>
     </div>
   );

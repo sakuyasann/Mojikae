@@ -77,6 +77,7 @@ export function FontSearchResult({
             }}
           >
             <span className={styles.name}>{item.font.family}</span>
+            {item.isIconFont && <span className={`${styles.badge} ${styles.badgeIcon}`}>アイコン</span>}
             {item.isJapanese && <span className={`${styles.badge} ${styles.badgeJapanese}`}>日本語</span>}
             <span className={styles.badge}>{CATEGORY_LABELS[item.font.category]}</span>
             <span className={styles.check} aria-hidden="true">
