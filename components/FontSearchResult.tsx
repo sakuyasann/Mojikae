@@ -49,7 +49,8 @@ export function FontSearchResult({
   }
 
   return (
-    <ul className={styles.list} id={listId} role="listbox" aria-multiselectable ref={listRef} aria-label="Google Fonts 検索結果">
+    <>
+      <ul className={styles.list} id={listId} role="listbox" aria-multiselectable ref={listRef} aria-label="Google Fonts 検索結果">
       {items.map((item, index) => {
         const isSelected = selectedFamilies.has(item.font.family);
         const classNames = [
@@ -92,11 +93,12 @@ export function FontSearchResult({
           </li>
         );
       })}
-      {totalCount > items.length && (
-        <li className={styles.more} role="presentation">
-          ほか {totalCount - items.length} 件（検索語を追加して絞り込んでください）
-        </li>
-      )}
-    </ul>
+      </ul>
+      <p className={styles.footer}>
+        {totalCount > items.length
+          ? `${totalCount} 件中 ${items.length} 件を表示・クリックで選択`
+          : `${totalCount} 件・クリックで選択`}
+      </p>
+    </>
   );
 }

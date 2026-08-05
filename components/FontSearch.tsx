@@ -1,6 +1,6 @@
 import { useId, useMemo, useState, type KeyboardEvent } from 'react';
 import { SEARCH_RESULT_LIMIT } from '../lib/constants';
-import { EMPTY_FILTER, isFilterActive, type FontFilter } from '../lib/font-filters';
+import { EMPTY_FILTER, type FontFilter } from '../lib/font-filters';
 import { countMatches, searchFonts } from '../lib/google-fonts';
 import type { GoogleFont } from '../types/google-font';
 import { FontFilters } from './FontFilters';
@@ -151,25 +151,24 @@ export function FontSearch({ fonts, selectedFamilies, disabled, onToggle }: Font
         )}
       </div>
 
-      <FontFilters fonts={fonts} filter={filter} disabled={disabled} onChange={handleFilterChange} />
-
+      {/*
+        絞り込みと件数表示は候補パネルの中に入れている。
+        常時表示にすると 50px 以上の縦幅を取り、ポップアップの高さを圧迫するため。
+      */}
       {showList && (
-        <FontSearchResult
-          listId={listId}
-          items={items}
-          activeIndex={activeIndex}
-          selectedFamilies={selectedFamilies}
-          totalCount={matchedCount}
-          onToggle={toggle}
-          onActiveIndexChange={setActiveIndex}
-        />
+        <div className={styles.panel}>
+          <FontFilters fonts={fonts} filter={filter} disabled={disabled} onChange={handleFilterChange} />
+          <FontSearchResult
+            listId={listId}
+            items={items}
+            activeIndex={activeIndex}
+            selectedFamilies={selectedFamilies}
+            totalCount={matchedCount}
+            onToggle={toggle}
+            onActiveIndexChange={setActiveIndex}
+          />
+        </div>
       )}
-
-      <p className={styles.hint}>
-        {isFilterActive(filter)
-          ? `絞り込み中：${matchedCount} 件`
-          : 'クリックまたは Enter で選択・解除。複数選べます。'}
-      </p>
     </div>
   );
 }

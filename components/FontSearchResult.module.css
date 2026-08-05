@@ -1,19 +1,12 @@
-/* 検索候補：白い角丸カードに行を並べる（iOS のインセットリスト） */
+/* 検索候補。パネル（FontSearch の .panel）の中で残りの高さを受け取る */
 .list {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
-  z-index: 20;
+  flex: 1 1 auto;
+  min-height: 0;
   margin: 0;
   padding: 0;
   list-style: none;
-  max-height: 300px;
   overflow-y: auto;
   overscroll-behavior: contain;
-  background: var(--mj-bg-elevated);
-  border-radius: var(--mj-radius-card);
-  box-shadow: var(--mj-shadow-raised);
 }
 
 .option {
@@ -93,23 +86,17 @@
 }
 
 .empty {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
-  z-index: 20;
   margin: 0;
   padding: 20px 12px;
   text-align: center;
   color: var(--mj-label-secondary);
-  background: var(--mj-bg-elevated);
-  border-radius: var(--mj-radius-card);
-  box-shadow: var(--mj-shadow-raised);
   font-size: 13px;
 }
 
-.more {
-  padding: 9px 12px;
+/* パネル下端の件数・操作説明 */
+.footer {
+  flex: none;
+  padding: 7px 10px;
   font-size: 11px;
   color: var(--mj-label-tertiary);
   text-align: center;

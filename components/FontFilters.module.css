@@ -1,8 +1,11 @@
+/* 候補パネル上部のヘッダーとして置く */
 .wrapper {
+  flex: none;
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-top: 8px;
+  padding: 8px;
+  border-bottom: 0.5px solid var(--mj-separator);
 }
 
 .field {
@@ -20,8 +23,7 @@
   padding: 0 22px 0 9px;
   border: none;
   border-radius: 6px;
-  background: var(--mj-bg-elevated);
-  box-shadow: var(--mj-shadow-control);
+  background: var(--mj-fill-quaternary);
   font-size: 12px;
   letter-spacing: -0.06px;
   color: var(--mj-label);
