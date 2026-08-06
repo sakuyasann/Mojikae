@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mojikae — そのページの文字を、Google Fonts で試す。</title>
+    <meta
+      name="description"
+      content="開いているページのフォントを検出して、Google Fonts へその場で差し替えるブラウザ拡張機能。英字と日本語で別の書体を組み合わせられます。"
+    />
+    <style>
+      /*__FONT_FACES__*/
+
+      :root {
+        --ink: #0b0b0c;
+        --ink-60: rgba(11, 11, 12, 0.6);
+        --ink-38: rgba(11, 11, 12, 0.38);
+        --paper: #ffffff;
+        --rule: rgba(11, 11, 12, 0.12);
+        --rule-strong: rgba(11, 11, 12, 0.9);
+        --accent: #10d9c4;
+
+        --sans: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+        --display: 'Instrument Serif', 'Shippori Mincho', serif;
+        --mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+
+        --gutter: clamp(20px, 5vw, 72px);
+        --max: 1280px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 16px;
+        line-height: 1.75;
+        letter-spacing: 0.01em;
+        -webkit-font-smoothing: antialiased;
+        font-feature-settings: 'palt' 1;
+      }
+
+      ::selection {
+        background: var(--accent);
+        color: var(--ink);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .shell {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 0 var(--gutter);
+      }
+
+      /* Swiss 的な構造線。セクションの境目はすべてヘアラインで示す */
+      .rule {
+        border-top: 1px solid var(--rule);
+      }
+
+      /* ------------------------------------------------------------- 見出し */
+
+      .eyebrow {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-38);
+      }
+
+      .eyebrow b {
+        font-weight: 500;
+        color: var(--ink);
+      }
+
+      .num {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        color: var(--accent);
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        font-weight: 400;
+      }
+
+      /* ---------------------------------------------------------------- 冒頭 */
+
+      .masthead {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 22px 0;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+
+      .brand svg {
+        display: block;
+      }
+
+      .brandName {
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .mastNav {
+        display: flex;
+        gap: 22px;
+        font-size: 13px;
+        color: var(--ink-60);
+      }
+
+      .mastNav a {
+        text-decoration: none;
+      }
+
+      .mastNav a:hover {
+        color: var(--ink);
+      }
+
+      /* ---------------------------------------------------------------- hero */
+
+      .hero {
+        padding: clamp(48px, 9vw, 132px) 0 clamp(36px, 6vw, 76px);
+      }
+
+      /*
+        ページの主役。ここが同時に製品のデモになっている。
+        欧文と和文で別の書体が当たっていて、下のボタンで組み合わせを切り替えられる。
+      */
+      .heroType {
+        margin: 30px 0 0;
+        font-size: clamp(2.7rem, 9.2vw, 8.4rem);
+        line-height: 0.98;
+        letter-spacing: -0.035em;
+        font-weight: 600;
+        transition: none;
+      }
+
+      .heroType .lat {
+        font-family: var(--pair-lat, var(--display));
+        font-style: italic;
+      }
+
+      .heroType .ja {
+        font-family: var(--pair-ja, var(--sans));
+        letter-spacing: -0.05em;
+      }
+
+      .heroType .dot {
+        color: var(--accent);
+      }
+
+      .heroLede {
+        max-width: 40em;
+        margin: clamp(26px, 4vw, 44px) 0 0;
+        font-size: clamp(15px, 1.35vw, 18px);
+        color: var(--ink-60);
+      }
+
+      /* 組み合わせ切り替え。製品の「英字＋日本語」をそのまま体験させる */
+      .pairs {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin-top: clamp(28px, 4vw, 44px);
+      }
+
+      .pairsLabel {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--ink-38);
+        margin-right: 6px;
+      }
+
+      .pair {
+        appearance: none;
+        border: 1px solid var(--rule);
+        background: transparent;
+        color: var(--ink-60);
+        border-radius: 999px;
+        padding: 7px 15px;
+        font: inherit;
+        font-size: 13px;
+        line-height: 1;
+        cursor: pointer;
+        transition: border-color 140ms ease, color 140ms ease;
+      }
+
+      .pair:hover {
+        border-color: var(--rule-strong);
+        color: var(--ink);
+      }
+
+      .pair[aria-pressed='true'] {
+        border-color: var(--ink);
+        color: var(--ink);
+        background: var(--ink);
+        color: var(--paper);
+      }
+
+      .pairStack {
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--ink-38);
+        word-break: break-all;
+      }
+
+      /* ------------------------------------------------------------ セクション */
+
+      .section {
+        padding: clamp(56px, 8vw, 116px) 0;
+      }
+
+      .sectionHead {
+        display: grid;
+        grid-template-columns: 4rem 1fr;
+        gap: 0 24px;
+        align-items: start;
+      }
+
+      .sectionTitle {
+        font-size: clamp(1.9rem, 4.4vw, 3.6rem);
+        line-height: 1.06;
+        letter-spacing: -0.03em;
+        font-weight: 600;
+        max-width: 18em;
+      }
+
+      .sectionBody {
+        margin-top: clamp(26px, 4vw, 48px);
+      }
+
+      /* 3 分割の説明。Swiss の段組をそのまま */
+      .cols {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--rule);
+        border-top: 1px solid var(--rule);
+        border-bottom: 1px solid var(--rule);
+      }
+
+      .col {
+        background: var(--paper);
+        padding: 30px 26px 34px;
+      }
+
+      .col h3 {
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        margin-bottom: 10px;
+      }
+
+      .col p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--ink-60);
+        line-height: 1.85;
+      }
+
+      .colNum {
+        display: block;
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        color: var(--accent);
+        margin-bottom: 18px;
+      }
+
+      /* ------------------------------------------------------- 実際の画面 */
+
+      .uiRow {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: clamp(28px, 4vw, 56px);
+        align-items: start;
+      }
+
+      .uiFigure {
+        margin: 0;
+      }
+
+      .uiFrame {
+        width: 380px;
+        max-width: 100%;
+        border: 1px solid var(--rule);
+        border-radius: 14px;
+        overflow: hidden;
+        background: #f2f2f7;
+      }
+
+      .uiCaption {
+        margin-top: 14px;
+        font-size: 13px;
+        color: var(--ink-60);
+      }
+
+      .uiCaption b {
+        display: block;
+        color: var(--ink);
+        font-weight: 600;
+        margin-bottom: 2px;
+      }
+
+      /* 埋め込んだ拡張機能 UI。実物の DOM と CSS をそのまま使っている */
+      .mjUi {
+        width: 380px;
+        font-size: 13px;
+      }
+
+      .mjUi * {
+        box-sizing: border-box;
+      }
+
+      /*
+        ポップアップは 600px で内部スクロールする作りだが、
+        紙面では全体を見せたいので高さ制限とスクロールを解除する。
+        背後に流れるものが無いので backdrop-filter も外す。
+      */
+      .mjUi > div {
+        max-height: none !important;
+      }
+
+      .mjUi [class*='_content_'],
+      .mjUi [class*='_list_'] {
+        overflow: visible !important;
+        max-height: none !important;
+      }
+
+      /* 検索候補は重なりが要点なので、そこだけは元の挙動を残す */
+      .mjUi [class*='_panel_'] [class*='_list_'] {
+        overflow: hidden !important;
+      }
+
+      .mjUi [class*='_header_'],
+      .mjUi [class*='_bar_'] {
+        position: static !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background: rgba(255, 255, 255, 0.92) !important;
+      }
+
+      /* --------------------------------------------------------- 引用ブロック */
+
+      .pull {
+        display: grid;
+        grid-template-columns: 4rem 1fr;
+        gap: 0 24px;
+      }
+
+      .pullText {
+        font-family: var(--display);
+        font-size: clamp(1.6rem, 3.6vw, 3rem);
+        line-height: 1.25;
+        letter-spacing: -0.02em;
+        max-width: 20em;
+      }
+
+      .pullText .ja {
+        font-family: 'Shippori Mincho', serif;
+        font-weight: 600;
+      }
+
+      /* ------------------------------------------------------------ 権限の表 */
+
+      .specs {
+        border-top: 1px solid var(--rule);
+      }
+
+      .spec {
+        display: grid;
+        grid-template-columns: minmax(160px, 22%) 1fr;
+        gap: 12px 24px;
+        padding: 20px 0;
+        border-bottom: 1px solid var(--rule);
+        align-items: baseline;
+      }
+
+      .specKey {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.02em;
+        color: var(--ink);
+      }
+
+      .specVal {
+        font-size: 14px;
+        color: var(--ink-60);
+        margin: 0;
+      }
+
+      .specVal b {
+        color: var(--ink);
+        font-weight: 600;
+      }
+
+      /* -------------------------------------------------------------- 導入部 */
+
+      .cta {
+        padding: clamp(60px, 9vw, 130px) 0;
+        text-align: center;
+      }
+
+      .ctaType {
+        font-size: clamp(2.2rem, 7vw, 6rem);
+        line-height: 1.02;
+        letter-spacing: -0.035em;
+        font-weight: 600;
+      }
+
+      .ctaType .lat {
+        font-family: var(--display);
+        font-style: italic;
+      }
+
+      .ctaRow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+        margin-top: clamp(30px, 4vw, 48px);
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 26px;
+        border-radius: 999px;
+        border: 1px solid var(--ink);
+        background: var(--ink);
+        color: var(--paper);
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: opacity 140ms ease;
+      }
+
+      .btn:hover {
+        opacity: 0.82;
+      }
+
+      .btnGhost {
+        background: transparent;
+        color: var(--ink);
+        border-color: var(--rule-strong);
+      }
+
+      /* ---------------------------------------------------------------- 脚部 */
+
+      footer {
+        padding: 40px 0 56px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px 28px;
+        justify-content: space-between;
+        align-items: baseline;
+        font-size: 12.5px;
+        color: var(--ink-38);
+      }
+
+      footer a {
+        text-decoration: none;
+      }
+
+      footer a:hover {
+        color: var(--ink);
+      }
+
+      /* -------------------------------------------------------------- 狭い幅 */
+
+      @media (max-width: 860px) {
+        .cols {
+          grid-template-columns: 1fr;
+        }
+        .sectionHead,
+        .pull {
+          grid-template-columns: 1fr;
+          gap: 14px;
+        }
+        .spec {
+          grid-template-columns: 1fr;
+          gap: 4px;
+        }
+      }
+
+      /*
+        埋め込み UI は実物なので幅 380px 固定。
+        画面が狭いときは切れないよう段階的に縮小する（zoom は再レイアウトするので高さも追従する）。
+      */
+      @media (max-width: 470px) {
+        .uiFrame {
+          width: 100%;
+        }
+        .mjUi {
+          zoom: 0.9;
+        }
+      }
+
+      @media (max-width: 410px) {
+        .mjUi {
+          zoom: 0.82;
+        }
+      }
+
+      @media (max-width: 370px) {
+        .mjUi {
+          zoom: 0.74;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+      }
+    </style>
+    <style id="popupCss">
+      /*__POPUP_CSS__*/
+    </style>
+  </head>
+
+  <body>
+    <div class="shell">
+      <header class="masthead">
+        <div class="brand">
+          <svg width="22" height="22" viewBox="96 96 320 320" aria-hidden="true">
+            <g fill="none" stroke="#0b0b0c" stroke-width="32" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M112 213V158a46 46 0 0 1 46-46h55" />
+              <path d="M112 299v55a46 46 0 0 0 46 46h55" />
+              <path d="M400 299v55a46 46 0 0 1-46 46h-55" />
+              <path d="M259 112h42" />
+              <path d="M400 201v30" />
+              <path d="M182 310v-70a37 37 0 0 1 74 0v70" />
+              <path d="M256 240a37 37 0 0 1 74 0v70" />
+            </g>
+            <circle cx="362" cy="150" r="38" fill="#10d9c4" />
+          </svg>
+          <span class="brandName">Mojikae</span>
+        </div>
+        <nav class="mastNav">
+          <a href="#what">できること</a>
+          <a href="#ui">画面</a>
+          <a href="#privacy">権限</a>
+          <a href="https://github.com/sakuyasann/Mojikae">GitHub</a>
+        </nav>
+      </header>
+    </div>
+
+    <div class="rule"></div>
+
+    <!-- ===================================================== hero ===== -->
+    <section class="shell hero">
+      <p class="eyebrow"><b>Browser Extension</b> <span>Chrome / Edge / Firefox</span></p>
+
+      <h1 class="heroType" id="heroType">
+        <span class="ja">そのページの文字を、</span><br />
+        <span class="lat">Google Fonts</span> <span class="ja">で試す<span class="dot">。</span></span>
+      </h1>
+
+      <p class="heroLede">
+        開いているタブで使われている書体を検出して、Google Fonts の 1,951 書体へその場で差し替えます。
+        欧文と和文に別の書体を当てられるので、この見出しのような組み合わせをそのまま画面上で確かめられます。
+      </p>
+
+      <div class="pairs" role="group" aria-label="見出しの書体を切り替える">
+        <span class="pairsLabel">この見出しの組み合わせ</span>
+        <button class="pair" type="button" data-lat="Instrument Serif" data-ja="Shippori Mincho" aria-pressed="true">
+          Instrument Serif + しっぽり明朝
+        </button>
+        <button class="pair" type="button" data-lat="Playfair Display" data-ja="Shippori Mincho" aria-pressed="false">
+          Playfair Display + しっぽり明朝
+        </button>
+        <button class="pair" type="button" data-lat="Archivo" data-ja="Zen Kaku Gothic New" aria-pressed="false">
+          Archivo + Zen角ゴシック
+        </button>
+        <button class="pair" type="button" data-lat="Poppins" data-ja="Zen Maru Gothic" aria-pressed="false">
+          Poppins + Zen丸ゴシック
+        </button>
+      </div>
+      <p class="pairStack" id="pairStack"></p>
+    </section>
+
+    <div class="rule"></div>
+
+    <!-- ================================================== できること ===== -->
+    <section class="shell section" id="what">
+      <div class="sectionHead">
+        <span class="num">01</span>
+        <h2 class="sectionTitle">見た目を決めるのは、たいてい書体だった。</h2>
+      </div>
+
+      <div class="sectionBody">
+        <div class="cols">
+          <div class="col">
+            <span class="colNum">検出</span>
+            <h3>そのページが何を使っているか</h3>
+            <p>
+              DOM を走査して、実際に描画されている font-family を数え上げます。外部スタイルシートが読めない場合でも、
+              要素の computed style を見るので取りこぼしません。
+            </p>
+          </div>
+          <div class="col">
+            <span class="colNum">差し替え</span>
+            <h3>欧文と和文に別の書体を</h3>
+            <p>
+              選んだ順に font-family へ並べます。字形を持たない文字は次の書体へ送られるので、
+              英数字は欧文書体、日本語は和文書体という使い分けがそのまま成立します。
+            </p>
+          </div>
+          <div class="col">
+            <span class="colNum">原状復帰</span>
+            <h3>閉じれば、何も残らない</h3>
+            <p>
+              変更は開いているタブだけ。設定はページ内の data 属性にしか持たないので、
+              リロードすれば必ず元に戻ります。サイトのクラスや style は書き換えません。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="rule"></div>
+
+    <!-- ==================================================== 実際の画面 ===== -->
+    <section class="shell section" id="ui">
+      <div class="sectionHead">
+        <span class="num">02</span>
+        <h2 class="sectionTitle">画面は、これだけ。</h2>
+      </div>
+
+      <div class="sectionBody">
+        <div class="uiRow">
+          <figure class="uiFigure">
+            <div class="uiFrame">
+              <div class="mjUi"><!--__UI_SELECTED__--></div>
+            </div>
+            <figcaption class="uiCaption">
+              <b>組み合わせを決める</b>
+              上から順に優先されます。ハンドルをドラッグすれば並び替えでき、
+              生成される font-family がその場で確認できます。
+            </figcaption>
+          </figure>
+
+          <figure class="uiFigure">
+            <div class="uiFrame">
+              <div class="mjUi"><!--__UI_SEARCH__--></div>
+            </div>
+            <figcaption class="uiCaption">
+              <b>書体名は、その書体で表示する</b>
+              一覧の名前はすべて実際の書体で描かれます。言語と種類で絞り込め、並びは人気順です。
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <div class="rule"></div>
+
+    <!-- ====================================================== 引用 ===== -->
+    <section class="shell section">
+      <div class="pull">
+        <span class="num">03</span>
+        <p class="pullText">
+          <span class="ja">コードは等幅のまま。アイコンは壊さない。</span>
+          <br />That restraint is the whole product.
+        </p>
+      </div>
+    </section>
+
+    <div class="rule"></div>
+
+    <!-- ==================================================== 権限 ===== -->
+    <section class="shell section" id="privacy">
+      <div class="sectionHead">
+        <span class="num">04</span>
+        <h2 class="sectionTitle">預かるものを、できるだけ少なく。</h2>
+      </div>
+
+      <div class="sectionBody">
+        <div class="specs">
+          <div class="spec">
+            <span class="specKey">activeTab</span>
+            <p class="specVal">
+              アイコンを押した<b>そのタブだけ</b>にアクセスします。<code>tabs</code> 権限は持たず、
+              他のタブや履歴には触れません。
+            </p>
+          </div>
+          <div class="spec">
+            <span class="specKey">scripting</span>
+            <p class="specVal">書体の検出と、上書き CSS の出し入れに使います。</p>
+          </div>
+          <div class="spec">
+            <span class="specKey">storage</span>
+            <p class="specVal">
+              保存するのは<b>最近使った書体名とプリセットだけ</b>。閲覧した URL・ページ内容・適用状態は保存しません。
+            </p>
+          </div>
+          <div class="spec">
+            <span class="specKey">host permissions</span>
+            <p class="specVal">
+              <code>fonts.googleapis.com</code> と <code>fonts.gstatic.com</code> のみ。
+              <b>&lt;all_urls&gt; は使いません。</b>
+            </p>
+          </div>
+          <div class="spec">
+            <span class="specKey">catalog</span>
+            <p class="specVal">
+              書体一覧は拡張機能に同梱しています。実行時に Google Fonts の API を呼ぶことはありません。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="rule"></div>
+
+    <!-- ====================================================== 導入 ===== -->
+    <section class="shell cta">
+      <h2 class="ctaType"><span class="lat">Try a typeface,</span><br />それから決める<span class="dot" style="color: var(--accent)">。</span></h2>
+      <div class="ctaRow">
+        <a class="btn" href="https://github.com/sakuyasann/Mojikae">GitHub で見る</a>
+        <a class="btn btnGhost" href="https://github.com/sakuyasann/Mojikae#firefox-へのインストール">インストール方法</a>
+      </div>
+    </section>
+
+    <div class="rule"></div>
+
+    <div class="shell">
+      <footer>
+        <span>Mojikae — Chrome / Edge / Firefox 142+ · Manifest V3</span>
+        <span>Google Fonts の書体名は各権利者に帰属します</span>
+      </footer>
+    </div>
+
+    <script>
+      // 見出しの組み合わせ切り替え。拡張機能がページへ当てるのと同じ font-family を組み立てる。
+      (function () {
+        const hero = document.getElementById('heroType');
+        const stack = document.getElementById('pairStack');
+        const buttons = [...document.querySelectorAll('.pair')];
+
+        const apply = (button) => {
+          const lat = button.dataset.lat;
+          const ja = button.dataset.ja;
+          hero.style.setProperty('--pair-lat', `'${lat}'`);
+          hero.style.setProperty('--pair-ja', `'${ja}'`);
+          stack.textContent = `font-family: "${lat}", "${ja}", serif;`;
+          for (const other of buttons) other.setAttribute('aria-pressed', String(other === button));
+        };
+
+        for (const button of buttons) button.addEventListener('click', () => { apply(button); });
+        apply(buttons[0]);
+      })();
+    </script>
+  </body>
+</html>
