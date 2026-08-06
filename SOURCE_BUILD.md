@@ -60,6 +60,11 @@ diff -r /tmp/submitted .output/firefox-mv3   # expected: no differences
   `assets/`. The generated file is committed, so this step is not part of the build
   either.
 - No obfuscation is used. Minification is esbuild's default for production builds.
+- This archive contains only what the add-on build uses. Two directories present in the
+  public repository are omitted because they sit outside the build entirely: `site/`
+  (the product web page) and `store/` (AMO listing copy and screenshots). Neither is
+  read, imported, or executed by `pnpm zip:firefox`. The full repository is at
+  <https://github.com/sakuyasann/Mojikae>.
 
 ## Optional verification
 

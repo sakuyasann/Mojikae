@@ -52,9 +52,11 @@ export default defineConfig({
   }),
 
   zip: {
-    // AMO へのソース提出物にはビルドに関係しない生成物を含めない。
-    // （掲載用スクリーンショットと、製品ページのビルド済み HTML）
-    excludeSources: ['store/screenshots/**', 'site/index.html', 'site/artifact.html'],
+    // AMO へのソース提出物は、拡張機能のビルドに関与するものだけにする。
+    // site/（製品ページ）と store/（掲載素材）はどちらもビルド経路の外にあり、
+    // コンパイル済み CSS や DOM スナップショットを含むため、
+    // 「機械的に生成されたソースファイル」と誤解される余地をなくす目的で除外する。
+    excludeSources: ['site/**', 'store/**'],
   },
 
   hooks: {
