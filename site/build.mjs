@@ -129,3 +129,16 @@ html = html.replace('/*__FONT_FACES__*/', cssParts.join('\n'));
 
 writeFileSync(new URL('index.html', DIR), html);
 console.log(`\nsite/index.html を書き出しました（${(html.length / 1024).toFixed(0)}KB）`);
+
+/*
+ * Artifact 用。<head>/<body> は公開時に付与されるので、中身だけを書き出す。
+ * <style> と <script> はそのまま body 内に置いて問題ない。
+ */
+const artifact = html
+  .replace(/^[\s\S]*?<head>/, '')
+  .replace(/<\/head>\s*<body>/, '')
+  .replace(/<\/body>\s*<\/html>\s*$/, '')
+  .replace(/<meta[^>]*>\s*/g, '')
+  .trim();
+writeFileSync(new URL('artifact.html', DIR), artifact);
+console.log(`site/artifact.html を書き出しました（${(artifact.length / 1024).toFixed(0)}KB）`);

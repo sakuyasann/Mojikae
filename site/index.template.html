@@ -11,14 +11,21 @@
     <style>
       /*__FONT_FACES__*/
 
+      /*
+        中立色はアクセント（青緑）へわずかに寄せた寒色。純グレーにしないことで
+        紙面全体が一段落ち着く。配色はトークンだけで切り替える。
+      */
       :root {
-        --ink: #0b0b0c;
-        --ink-60: rgba(11, 11, 12, 0.6);
-        --ink-38: rgba(11, 11, 12, 0.38);
-        --paper: #ffffff;
-        --rule: rgba(11, 11, 12, 0.12);
-        --rule-strong: rgba(11, 11, 12, 0.9);
-        --accent: #10d9c4;
+        color-scheme: light dark;
+
+        --paper: #fdfdfc;
+        --ink: #0c0e0e;
+        --ink-60: rgba(12, 18, 18, 0.62);
+        --ink-38: rgba(12, 18, 18, 0.4);
+        --rule: rgba(12, 20, 20, 0.13);
+        --rule-strong: rgba(12, 20, 20, 0.85);
+        --accent: #0aa693;
+        --accent-quiet: #0fc9b5;
 
         --sans: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
         --display: 'Instrument Serif', 'Shippori Mincho', serif;
@@ -26,6 +33,43 @@
 
         --gutter: clamp(20px, 5vw, 72px);
         --max: 1280px;
+      }
+
+      /* 暗所。反転ではなく、紙を墨へ・アクセントを明るい側へ置き換える */
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --paper: #0b0d0d;
+          --ink: #f2f4f3;
+          --ink-60: rgba(238, 244, 243, 0.62);
+          --ink-38: rgba(238, 244, 243, 0.38);
+          --rule: rgba(238, 244, 243, 0.16);
+          --rule-strong: rgba(238, 244, 243, 0.8);
+          --accent: #2ee9d4;
+          --accent-quiet: #2ee9d4;
+        }
+      }
+
+      /* 閲覧側のテーマ切り替えは media query より優先させる */
+      :root[data-theme='dark'] {
+        --paper: #0b0d0d;
+        --ink: #f2f4f3;
+        --ink-60: rgba(238, 244, 243, 0.62);
+        --ink-38: rgba(238, 244, 243, 0.38);
+        --rule: rgba(238, 244, 243, 0.16);
+        --rule-strong: rgba(238, 244, 243, 0.8);
+        --accent: #2ee9d4;
+        --accent-quiet: #2ee9d4;
+      }
+
+      :root[data-theme='light'] {
+        --paper: #fdfdfc;
+        --ink: #0c0e0e;
+        --ink-60: rgba(12, 18, 18, 0.62);
+        --ink-38: rgba(12, 18, 18, 0.4);
+        --rule: rgba(12, 20, 20, 0.13);
+        --rule-strong: rgba(12, 20, 20, 0.85);
+        --accent: #0aa693;
+        --accent-quiet: #0fc9b5;
       }
 
       * {
@@ -240,10 +284,7 @@
       }
 
       .sectionHead {
-        display: grid;
-        grid-template-columns: 4rem 1fr;
-        gap: 0 24px;
-        align-items: start;
+        display: block;
       }
 
       .sectionTitle {
@@ -287,13 +328,21 @@
         line-height: 1.85;
       }
 
+      /* ここだけは実際の処理順なので番号が意味を持つ */
       .colNum {
-        display: block;
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
         font-family: var(--mono);
         font-size: 11px;
         letter-spacing: 0.14em;
         color: var(--accent);
         margin-bottom: 18px;
+      }
+
+      .colNum i {
+        font-style: normal;
+        color: var(--ink-38);
       }
 
       /* ------------------------------------------------------- 実際の画面 */
@@ -309,6 +358,7 @@
         margin: 0;
       }
 
+      /* 拡張機能の実物はライトテーマ固定なので、暗所でも白いまま見せる */
       .uiFrame {
         width: 380px;
         max-width: 100%;
@@ -316,6 +366,7 @@
         border-radius: 14px;
         overflow: hidden;
         background: #f2f2f7;
+        color-scheme: light;
       }
 
       .uiCaption {
@@ -372,9 +423,7 @@
       /* --------------------------------------------------------- 引用ブロック */
 
       .pull {
-        display: grid;
-        grid-template-columns: 4rem 1fr;
-        gap: 0 24px;
+        display: block;
       }
 
       .pullText {
@@ -496,6 +545,30 @@
         color: var(--ink);
       }
 
+      .colophon {
+        max-width: 46em;
+      }
+
+      .colophonLabel {
+        display: block;
+        font-family: var(--mono);
+        font-size: 10.5px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-38);
+        margin-bottom: 8px;
+      }
+
+      .colophon p {
+        margin: 0;
+        color: var(--ink-60);
+        line-height: 1.9;
+      }
+
+      .colophonNote {
+        color: var(--accent);
+      }
+
       /* -------------------------------------------------------------- 狭い幅 */
 
       @media (max-width: 860px) {
@@ -554,7 +627,7 @@
       <header class="masthead">
         <div class="brand">
           <svg width="22" height="22" viewBox="96 96 320 320" aria-hidden="true">
-            <g fill="none" stroke="#0b0b0c" stroke-width="32" stroke-linecap="round" stroke-linejoin="round">
+            <g fill="none" stroke="currentColor" stroke-width="32" stroke-linecap="round" stroke-linejoin="round">
               <path d="M112 213V158a46 46 0 0 1 46-46h55" />
               <path d="M112 299v55a46 46 0 0 0 46 46h55" />
               <path d="M400 299v55a46 46 0 0 1-46 46h-55" />
@@ -563,7 +636,7 @@
               <path d="M182 310v-70a37 37 0 0 1 74 0v70" />
               <path d="M256 240a37 37 0 0 1 74 0v70" />
             </g>
-            <circle cx="362" cy="150" r="38" fill="#10d9c4" />
+            <circle cx="362" cy="150" r="38" fill="var(--accent-quiet)" />
           </svg>
           <span class="brandName">Mojikae</span>
         </div>
@@ -615,14 +688,13 @@
     <!-- ================================================== できること ===== -->
     <section class="shell section" id="what">
       <div class="sectionHead">
-        <span class="num">01</span>
         <h2 class="sectionTitle">見た目を決めるのは、たいてい書体だった。</h2>
       </div>
 
       <div class="sectionBody">
         <div class="cols">
           <div class="col">
-            <span class="colNum">検出</span>
+            <span class="colNum"><i>1</i>検出</span>
             <h3>そのページが何を使っているか</h3>
             <p>
               DOM を走査して、実際に描画されている font-family を数え上げます。外部スタイルシートが読めない場合でも、
@@ -630,7 +702,7 @@
             </p>
           </div>
           <div class="col">
-            <span class="colNum">差し替え</span>
+            <span class="colNum"><i>2</i>差し替え</span>
             <h3>欧文と和文に別の書体を</h3>
             <p>
               選んだ順に font-family へ並べます。字形を持たない文字は次の書体へ送られるので、
@@ -638,7 +710,7 @@
             </p>
           </div>
           <div class="col">
-            <span class="colNum">原状復帰</span>
+            <span class="colNum"><i>3</i>原状復帰</span>
             <h3>閉じれば、何も残らない</h3>
             <p>
               変更は開いているタブだけ。設定はページ内の data 属性にしか持たないので、
@@ -654,7 +726,6 @@
     <!-- ==================================================== 実際の画面 ===== -->
     <section class="shell section" id="ui">
       <div class="sectionHead">
-        <span class="num">02</span>
         <h2 class="sectionTitle">画面は、これだけ。</h2>
       </div>
 
@@ -689,7 +760,6 @@
     <!-- ====================================================== 引用 ===== -->
     <section class="shell section">
       <div class="pull">
-        <span class="num">03</span>
         <p class="pullText">
           <span class="ja">コードは等幅のまま。アイコンは壊さない。</span>
           <br />That restraint is the whole product.
@@ -702,7 +772,6 @@
     <!-- ==================================================== 権限 ===== -->
     <section class="shell section" id="privacy">
       <div class="sectionHead">
-        <span class="num">04</span>
         <h2 class="sectionTitle">預かるものを、できるだけ少なく。</h2>
       </div>
 
@@ -757,8 +826,16 @@
 
     <div class="shell">
       <footer>
+        <div class="colophon">
+          <span class="colophonLabel">このページで使った書体</span>
+          <p>
+            Instrument Serif ／ Shippori Mincho ／ Playfair Display ／ Archivo ／ Zen Kaku Gothic New ／
+            Poppins ／ Zen Maru Gothic ／ Inter ／ Noto Sans JP
+            <br />
+            <span class="colophonNote">すべて Google Fonts。つまり、すべて Mojikae で選べます。</span>
+          </p>
+        </div>
         <span>Mojikae — Chrome / Edge / Firefox 142+ · Manifest V3</span>
-        <span>Google Fonts の書体名は各権利者に帰属します</span>
       </footer>
     </div>
 

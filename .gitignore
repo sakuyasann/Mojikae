@@ -10,3 +10,6 @@ web-ext.config.ts
 
 # UI ライブプレビュー用（ローカル専用）
 .preview
+
+# Artifact 用に生成する中間ファイル
+site/artifact.html
