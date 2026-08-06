@@ -182,6 +182,24 @@ HOW TO TEST
 5. To test the Latin + Japanese pairing, select two fonts (for example "Playfair
    Display" then "Zen Maru Gothic") and apply.
 
+VALIDATION WARNINGS ("Unsafe assignment to innerHTML")
+The validator reports this warning on chunks/popup-*.js. Every occurrence is inside the
+bundled react-dom runtime, not in this add-on's own code:
+
+  - react-dom's property setter, which handles the `dangerouslySetInnerHTML` prop
+    (`case "dangerouslySetInnerHTML": ... t.innerHTML = u`)
+  - react-dom's element factory, which creates a <script> element via a detached div
+    (`n = c.createElement("div"), n.innerHTML = "<script><\/script>"`)
+
+This add-on's source contains no `innerHTML` and no `dangerouslySetInnerHTML`. You can
+confirm this on the source archive with:
+
+  grep -rn "innerHTML\|dangerouslySetInnerHTML" components/ lib/ entrypoints/   # no matches
+
+Because the `dangerouslySetInnerHTML` prop is never passed anywhere, that react-dom
+branch is unreachable at runtime. React 19.2 is installed from the public npm registry
+and is unmodified; the exact version is pinned in pnpm-lock.yaml.
+
 PERMISSIONS
 - activeTab: the popup only ever touches the tab the user clicked the icon on. The
   `tabs` permission is not requested and no URL is read beyond checking the scheme is
@@ -195,6 +213,42 @@ No data collection occurs; the manifest declares
 browser_specific_settings.gecko.data_collection_permissions.required = ["none"].
 
 Privacy policy: https://github.com/sakuyasann/Mojikae/blob/main/PRIVACY.md
+```
+
+---
+
+## バージョンノート（0.2.1・貼り付け用）
+
+AMO の「バージョンノート」欄。公開ページに表示されます。
+
+### 日本語
+
+```
+addons.mozilla.org での公開にあたっての初回リリースです。機能面は自己配布していた 0.2.0 と同じで、ライセンス（MIT）とプライバシーポリシーの明記、レビュー用のビルド手順の追加のみを行っています。
+
+主な機能
+・ページで実際に使われている font-family を検出して一覧表示
+・ページ全体、または特定の font-family だけを Google Fonts へ差し替え
+・欧文と和文で別々の書体を組み合わせて適用
+・検索結果をその書体自身で描画。言語と種類で絞り込み
+・フォントの組み合わせをプリセットとして保存（最大 20 件）
+
+変更はアイコンを押したタブにのみ適用され、リロードするとすべて元に戻ります。
+```
+
+### English
+
+```
+First release published on addons.mozilla.org. Functionally identical to 0.2.0, which was self-distributed; this version only adds an explicit license (MIT), a privacy policy, and build instructions for review.
+
+Highlights
+- Detects the font-family values actually in use on the page and lists them
+- Override the whole page, or just one specific font-family, with Google Fonts
+- Combine a Latin typeface with a Japanese one
+- Search results are rendered in their own typeface; filter by language and category
+- Save font combinations as presets (up to 20)
+
+Changes apply only to the tab where you clicked the icon and are fully reverted on reload.
 ```
 
 ---
