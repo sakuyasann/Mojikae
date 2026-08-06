@@ -51,6 +51,12 @@ export default defineConfig({
       : {}),
   }),
 
+  zip: {
+    // AMO へのソース提出物にはビルドに関係しない生成物を含めない。
+    // （掲載用スクリーンショットと、製品ページのビルド済み HTML）
+    excludeSources: ['store/screenshots/**', 'site/index.html', 'site/artifact.html'],
+  },
+
   hooks: {
     // data/google-fonts.json は public/ の外にあるので、明示的に出力へコピーする。
     'build:publicAssets': (wxt, files) => {

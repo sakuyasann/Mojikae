@@ -491,4 +491,24 @@ pnpm exec vite --config .preview/vite.config.ts
 
 ## ライセンス
 
-社内利用を想定した非公開プロジェクトです。
+[MIT License](LICENSE)
+
+## プライバシー
+
+収集・送信する情報はありません。詳細は [PRIVACY.md](PRIVACY.md) を参照してください。
+
+## AMO への掲載
+
+addons.mozilla.org へ Listed で提出するための資料は次の 2 つです。
+
+| ファイル | 用途 |
+| --- | --- |
+| [`SOURCE_BUILD.md`](SOURCE_BUILD.md) | レビュアー向けのビルド手順（バンドル・minify しているためソース提出が必須） |
+| [`store/amo-listing.md`](store/amo-listing.md) | 掲載情報・説明文・プライバシーポリシー・レビュアー向けメモの原稿 |
+
+提出物は `pnpm zip:firefox` が両方まとめて出力します。
+
+```
+.output/mojikae-<version>-firefox.zip   # アドオン本体
+.output/mojikae-<version>-sources.zip   # ソースコード提出用
+```

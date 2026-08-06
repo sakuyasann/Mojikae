@@ -1,8 +1,14 @@
 {
   "name": "mojikae",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "現在のタブで使われているフォントを検出し、Google Fonts へ一時的に上書きして比較できるブラウザ拡張機能",
+  "license": "MIT",
+  "homepage": "https://github.com/sakuyasann/Mojikae",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sakuyasann/Mojikae.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "wxt",
@@ -17,6 +23,7 @@
     "test": "vitest run",
     "fonts:sync": "tsx scripts/sync-google-fonts.ts",
     "logo:build": "node scripts/build-logo.mjs",
+    "store:screenshots": "node store/build-screenshots.mjs",
     "postinstall": "wxt prepare"
   },
   "dependencies": {

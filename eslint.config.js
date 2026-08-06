@@ -45,7 +45,14 @@ export default tseslint.config(
 
   // Node で動くファイル
   {
-    files: ['scripts/**/*.{ts,mjs}', 'wxt.config.ts', 'eslint.config.js', 'vitest.config.ts'],
+    files: [
+      'scripts/**/*.{ts,mjs}',
+      'site/**/*.mjs',
+      'store/**/*.mjs',
+      'wxt.config.ts',
+      'eslint.config.js',
+      'vitest.config.ts',
+    ],
     languageOptions: {
       globals: globals.node,
     },
