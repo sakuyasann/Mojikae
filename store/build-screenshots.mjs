@@ -13,14 +13,20 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = new URL('../', import.meta.url);
-const OUT = new URL('./screenshots/', import.meta.url);
 const read = (path) => readFileSync(new URL(path, ROOT), 'utf8');
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const WIDTH = 1280;
 const HEIGHT = 800;
-/** Retina 相当で焼く（AMO の上限は 4096px）。 */
-const SCALE = 2;
+
+/**
+ * ストアごとに要求サイズが違うので、倍率と出力先を環境変数で切り替える。
+ *
+ *   AMO           : 上限 2400x1800 → 1.875 倍で 2400x1500
+ *   Chrome Web Store: 1280x800 ちょうど（または 640x400）→ 等倍
+ */
+const SCALE = Number(process.env.SHOT_SCALE ?? 1.875);
+const OUT = new URL(`./${process.env.SHOT_DIR ?? 'screenshots'}/`, import.meta.url);
 
 const SHOTS = [
   {

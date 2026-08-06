@@ -489,6 +489,15 @@ pnpm exec vite --config .preview/vite.config.ts
 - 日本語以外のサブセット優先表示の切り替え
 - Shadow DOM の走査
 
+## Chrome Web Store への掲載
+
+原稿は [`store/cws-listing.md`](store/cws-listing.md)。AMO と違いソースコードの提出は不要です。
+
+```bash
+pnpm zip                                                        # .output/mojikae-<version>-chrome.zip
+SHOT_SCALE=1 SHOT_DIR=screenshots-chrome pnpm store:screenshots  # 1280x800（CWS はこの寸法ちょうどを要求）
+```
+
 ## ライセンス
 
 [MIT License](LICENSE)
